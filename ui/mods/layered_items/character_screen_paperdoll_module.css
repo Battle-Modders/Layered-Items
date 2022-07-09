@@ -1,0 +1,10 @@
+.layer-container {
+	width: 2.2rem;
+	position: absolute;
+	left: -3rem;
+}
+
+.l-layered-layer-button {
+	width: 2.2rem;
+	height: 2.2rem;
+}

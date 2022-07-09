@@ -2,7 +2,7 @@ this.layered_gambeson <- this.inherit("scripts/items/layered_armor/layered_armor
 	m = {},
 	function create()
 	{
-		this.armor.create();
+		this.layered_armor.create();
 		this.m.ID = "layered_armor.gambeson";
 		this.m.Name = "Gambeson";
 		this.m.Description = "A sturdy and heavy padded tunic that offers decent protection.";

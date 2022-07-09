@@ -1,0 +1,68 @@
+.ui-control.layered-items-button
+{
+	width: 2.2rem;
+	height: 2.2rem;
+	position: relative;
+
+	background-image: url("coui://gfx/mods/layered_items/layer_button_default.png");
+	background-size: 2.2rem 2.2rem;
+	text-shadow: 1px 1px 1px #000;
+
+	color: #dda21f;
+}
+
+.ui-control.layered-items-button:hover,
+.ui-control.layered-items-button.is-selected,
+.ui-control.layered-items-button.is-active {
+	background-image: url("coui://gfx/mods/layered_items/layer_button_hovered.png");
+}
+
+.ui-control.layered-items-button[disabled],
+.ui-control.layered-items-button[disabled]:hover,
+.ui-control.layered-items-button[disabled]:active {
+	color: #a7a7a7;
+	background-image: url("coui://gfx/mods/layered_items/layer_button_inactive.png");
+	background-size: 2.2rem 2.2rem;
+}
+
+.ui-control.layered-items-button.invisible-layer {
+	background-image: url("coui://gfx/mods/layered_items/layer_button_invisible.png");
+}
+
+.ui-control.layered-items-button > .label {
+	top: -0.2rem;
+	bottom: 0;
+	left: 0;
+	right: 0;
+
+	position: absolute;
+
+	margin-top: 0;
+	text-align: center;
+
+	overflow: hidden;
+}
+
+.ui-control.layered-items-button.is-selected > .label {
+	top: 0;
+	left: 0.1rem;
+}
+
+.ui-control.layered-items-button > img {
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	position: absolute;
+	margin: auto;
+}
+
+.ui-control.layered-items-button[disabled] > img {
+	-webkit-filter: grayscale(100%);
+}
+
+.ui-control.layered-items-button.is-selected > img {
+	top: -0.2rem;
+	left: 0.1rem;
+}

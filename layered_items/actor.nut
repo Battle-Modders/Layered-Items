@@ -2,56 +2,80 @@
 {
 	local onInit = ::mods_getMember(o, "onInit");
 	// sprites seem to only be added during oninit so I'm gonna assume everyone does this
-	o.onInit <- function( ... ) // not a huge fan of this approach but it's better than doing this shit manually
+	o.onInit <- function() // not a huge fan of this approach but it's better than doing this shit manually
 	{
-		vargv.insert(0, this)
+		local hookedHere = false;
 		local addSprite = this.addSprite;
-		this.addSprite = function(_sprite)
+		if (!::MSU.isIn("LayeredItems_HookOnce", this.m))
 		{
-			if (_sprite == "helmet")
+			this.m.LayeredItems_HookOnce <- true;
+			hookedHere = true;
+			this.addSprite = function(_sprite)
 			{
-				foreach (layer in ::LayeredItems.HelmetLayerSprites)
+				local ret = addSprite(_sprite);
+				if (_sprite == "helmet")
 				{
-					addSprite(layer);
+					foreach (sprite in ::LayeredItems.Helmet.Sprite)
+					{
+						addSprite(sprite);
+					}
 				}
-			}
-			else if (_sprite == "armor")
-			{
-				foreach (layer in ::LayeredItems.ArmorLayerSprites)
+				else if (_sprite == "armor")
 				{
-					addSprite(layer);
+					foreach (sprite in ::LayeredItems.Armor.Sprite)
+					{
+						addSprite(sprite);
+					}
 				}
+				return ret;
 			}
-			addSprite(_sprite);
 		}
 
-		local ret = onInit.acall(vargv);
-		this.addSprite = addSprite;
+
+		local ret = onInit();
+
+		if (hookedHere)
+		{
+			delete this.m.LayeredItems_HookOnce;
+			this.addSprite = addSprite;
+		}
+
 		return ret;
 	}
 
 	local onFactionChanged = ::mods_getMember(o, "onFactionChanged");
-	o.onFactionChanged <- function( ... )
+	o.onFactionChanged <- function()
 	{
-		vargv.insert(0, this);
-		local ret = onFactionChanged.acall(vargv);
-
-		if (this.hasSprite("helmet"))
+		local hookedHere = false;
+		if (!::MSU.isIn("LayeredItems_HookOnce", this.m))
 		{
-			local flip = this.getSprite("helmet").isFlippedHorizontally();
-			foreach (layer in ::LayeredItems.HelmetLayerSprites)
-			{
-				layer.setHorizontalFlipping(flip)
-			}
+			hookedHere = true;
+			this.m.LayeredItems_HookOnce <- true;
 		}
 
-		if (this.hasSprite("armor"))
+		local ret = onFactionChanged();
+
+		if (hookedHere)
 		{
-			local flip = this.getSprite("armor").isFlippedHorizontally();
-			foreach (layer in ::LayeredItems.ArmorLayerSprites)
+			if (this.hasSprite("helmet"))
 			{
-				layer.setHorizontalFlipping(flip)
+				local flip = this.getSprite("helmet").isFlippedHorizontally();
+				foreach (sprite in ::LayeredItems.Helmet.Sprite)
+				{
+					this.getSprite(sprite).setHorizontalFlipping(flip)
+				}
 			}
+
+			if (this.hasSprite("armor"))
+			{
+				local flip = this.getSprite("armor").isFlippedHorizontally();
+				foreach (sprite in ::LayeredItems.Armor.Sprite)
+				{
+					this.getSprite(sprite).setHorizontalFlipping(flip)
+				}
+			}
+
+			delete this.m.LayeredItems_HookOnce;
 		}
 
 		return ret;
@@ -61,52 +85,49 @@
 ::mods_hookExactClass("entity/tactical/actor", function (o)
 {
 	local onAppearanceChanged = o.onAppearanceChanged;
-	// _appearance, _setDirty = true
-	o.onAppearanceChanged = function( ... )
+	o.onAppearanceChanged = function( _appearance, _setDirty = true )
 	{
-		vargv.insert(0, this);
-
 		if (!this.m.IsAlive || this.m.IsDying)
 		{
 			return;
 		}
 
-		foreach (layer in ::LayeredItems.HelmetLayerSprites)
+		foreach (sprite in ::LayeredItems.Helmet.Sprite)
 		{
-			if (this.hasSprite(layer))
+			if (this.hasSprite(sprite))
 			{
-				if (vargv[1][layer] != "" && !this.m.IsHidingHelmet)
+				if (_appearance[sprite] != "" && !this.m.IsHidingHelmet)
 				{
-					local helmet = this.getSprite(layer);
-					helmet.setBrush(vargv[1][layer]);
-					helmet.Color = vargv[1].HelmetColor;
-					helmet.Visible = true;
+					local layer = this.getSprite(sprite);
+					layer.setBrush(_appearance[sprite]);
+					layer.Color = _appearance.HelmetColor;
+					layer.Visible = true;
 				}
 				else
 				{
-					this.getSprite(layer).Visible = false;
+					this.getSprite(sprite).Visible = false;
 				}
 			}
 		}
 
-		foreach (layer in ::LayeredItems.ArmorLayerSprites)
+		foreach (sprite in ::LayeredItems.Armor.Sprite)
 		{
-			if (this.hasSprite(layer))
+			if (this.hasSprite(sprite))
 			{
-				if (vargv[1][layer] != "")
+				if (_appearance[sprite] != "")
 				{
-					local helmet = this.getSprite(layer);
-					helmet.setBrush(vargv[1][layer]);
-					helmet.Color = vargv[1].ArmorColor;
-					helmet.Visible = true;
+					local layer = this.getSprite(sprite);
+					layer.setBrush(_appearance[sprite]);
+					layer.Color = _appearance.ArmorColor;
+					layer.Visible = true;
 				}
 				else
 				{
-					this.getSprite(layer).Visible = false;
+					this.getSprite(sprite).Visible = false;
 				}
 			}
 		}
 
-		return onAppearanceChanged.acall(vargv);
+		return onAppearanceChanged(_appearance, _setDirty);
 	}
-}
+});

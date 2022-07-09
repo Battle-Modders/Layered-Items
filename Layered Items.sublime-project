@@ -20,7 +20,7 @@
 		{
 			"name" : "Update Mod and Launch",
 			"working_dir" : "$project_path",
-			"shell_cmd" : "powershell \"..\\ kill.ps1\" && python -u ../updateMod.py && cd D:/Games/GOG Games/Battle Brothers/ && \"C:/GOG Games/Battle Brothers/win32/BattleBrothers.exe\"",
+			"shell_cmd" : "powershell \"..\\kill.ps1\" && python -u ../updateMod.py && cd C:/GOG Games/Battle Brothers/ && \"C:/GOG Games/Battle Brothers/win32/BattleBrothers.exe\"",
 		}
 	],
 }

@@ -1,46 +1,72 @@
 ::LayeredItems.hookLayeredItem <- function( o )
 {
-	o.m.LayeredItems_Layers <- {};
-	o.m.LayeredItems_BlockedLayers <- []; // array of blocked layers, eg if the layer "Cloth" is blocked, then BlockedLayers would contain an entry with value "Cloth"
-	o.m.LayeredItems_Type <- ::LayeredItems.Type.None;
+	o.m.LayeredItems <- {
+		Layers = [],
+		BlockedLayers = [],
+		// should probably also have an option for hidden layers
+		BaseSprite = ""
+	}
 
 	local create = o.create;
 	o.create = function()
 	{
 		create();
+		this.m.LayeredItems.Layers = array(::LayeredItems[this.m.LayeredItems.BaseSprite].Layer.len());
+		this.m.LayeredItems.BlockedLayers = array(::LayeredItems[this.m.LayeredItems.BaseSprite].Layer.len(), false);
 	}
 
-	o.LayeredItems_returnTrueIfAnyTrue <- function( _function, _argsArray )
+	o.LayeredItems_getLayers <- function()
 	{
-		foreach (layer in this.m.LayeredItems_Layers)
-		{
-			vargv[0] = layer;
-			if (layer != null && layer[_function].acall(vargv) == true) return true;
-		}
-		return false;
+		return this.m.LayeredItems.Layers.filter(@(_idx, _layer) _layer != null);
 	}
 
-	local returnTrueIfAnyTrueFunctions = [
-		"isNamed"
-	];
-
-	foreach (functionName in returnTrueIfAnyTrueFunctions)
+	o.LayeredItems_getLayerContainer <- function()
 	{
-		local oldFunction = ::mods_getMember(o, functionName);
-		o[functionName] <- function( ... )
-		{
-			vargv.insert(0, this)
-			if (oldFunction.acall(vargv) == true) return true;
-			return this.LayeredItems_returnTrueIfAnyTrue(functionName, vargv);
-		}
+		return this.m.LayeredItems.Layers;
 	}
+
+	o.LayeredItems_getLayer <- function( _layer )
+	{
+		return this.LayeredItems_getLayerContainer()[_layer];
+	}
+
+	o.LayeredItems_getBaseSprite <- function()
+	{
+		return this.m.LayeredItems.BaseSprite;
+	}
+
+	// o.LayeredItems_returnTrueIfAnyTrue <- function( _function, _argsArray )
+	// {
+	// 	foreach (layer in this.m.LayeredItems.Layers)
+	// 	{
+	// 		vargv[0] = layer;
+	// 		if (layer != null && layer[_function].acall(vargv) == true) return true;
+	// 	}
+	// 	return false;
+	// }
+
+	// local returnTrueIfAnyTrueFunctions = [
+	// 	"isNamed"
+	// ];
+
+	// foreach (functionName in returnTrueIfAnyTrueFunctions)
+	// {
+	// 	local oldFunction = ::mods_getMember(o, functionName);
+	//  local tempName = functionName;
+	// 	o[functionName] <- function( ... )
+	// 	{
+	// 		vargv.insert(0, this)
+	// 		if (oldFunction.acall(vargv) == true) return true;
+	// 		return this.LayeredItems_returnTrueIfAnyTrue(tempName, vargv);
+	// 	}
+	// }
 
 	o.LayeredItems_returnFalseIfAnyFalse <- function( _function, _argsArray )
 	{
-		foreach (layer in this.m.LayeredItems_Layers)
+		foreach (layer in this.LayeredItems_getLayers())
 		{
 			vargv[0] = layer;
-			if (layer != null && layer[_function].acall(vargv) == false)
+			if (layer[_function].acall(vargv) == false)
 			{
 				return false;
 			}
@@ -56,20 +82,21 @@
 	foreach (functionName in returnFalseIfAnyFalseFunctions)
 	{
 		local oldFunction = ::mods_getMember(o, functionName);
+		local tempName = functionName;
 		o[functionName] <- function( ... )
 		{
 			vargv.insert(0, this);
-			if (oldFunction.acall(vargv) == false) return false;
-			return this.LayeredItems_returnFalseIfAnyFalse(functionName, vargv);
+			if (oldFunction.bindenv(this).acall(vargv) == false) return false;
+			return this.LayeredItems_returnFalseIfAnyFalse(tempName, vargv);
 		}
 	}
 
 	o.LayeredItems_getAddedValue <- function( _function, _base, _argsArray ) // _argsArray assumes 'this' slot exists
 	{
-		foreach (layer in this.m.LayeredItems_Layers)
+		foreach (layer in this.LayeredItems_getLayers())
 		{
 			_argsArray[0] = layer;
-			if (layer != null) _base += layer[_function].acall(_argsArray);
+			_base += layer[_function].acall(_argsArray);
 		}
 		return _base;
 	}
@@ -85,26 +112,25 @@
 		"getStaminaModifier",
 		"getValue"
 	]
+	// getDescription?
 
 	foreach (functionName in addedValueFunctions)
 	{
-		local oldFunction = ::mods_getMember(o, functionName);
-		o[functionName] <- function( ... )
+		local tempName = functionName;
+		local oldFunction = ::mods_getMember(o, tempName);
+		o[tempName] <- function( ... )
 		{
 			vargv.insert(0, this)
-			return this.__LayeredItems_getAddedValue(functionName, oldFunction.acall(vargv));
+			return this.LayeredItems_getAddedValue(tempName, oldFunction.bindenv(this).acall(vargv), vargv);
 		}
 	}
 
 	o.LayeredItems_callOnFunction <- function( _function, _argsArray ) // _argsArray assumes 'this' slot exists
 	{
-		foreach (layer in this.m.LayeredItems_Layers)
+		foreach (layer in this.LayeredItems_getLayers())
 		{
-			if (layer != null)
-			{
-				_argsArray[0] = layer;
-				layer[_function].acall(_argsArray);
-			}
+			_argsArray[0] = layer;
+			layer[_function].acall(_argsArray);
 		}
 	}
 
@@ -126,7 +152,7 @@
 		"onBeforeDamageReceived",
 		"onDamageDealt",
 		"onShieldHit",
-		"onUpdateProperties",
+		// "onUpdateProperties", unnecessary because since each layer has its own generic_item skill, they get handled together, this may not be desirable
 		"onTurnStart",
 		"onUse",
 		"onTotalArmorChanged",
@@ -138,156 +164,238 @@
 		"onRemovedFromStash",
 
 		// MSU
-		"onAfterUpdateProperties"
+		// "onAfterUpdateProperties" unnecessary because since each layer has its own generic_item skill, they get handled together, this may not be desirable
 	]
 
 	foreach (functionName in callOnFunctions)
 	{
 		local oldFunction = ::mods_getMember(o, functionName);
+		local tempName = functionName;
 		o[functionName] <- function( ... )
 		{
 			vargv.insert(0, this);
-			oldFunction.acall(vargv);
-			this.LayeredItems_callOnFunction(functionName, vargv);
+			oldFunction.bindenv(this).acall(vargv);
+			this.LayeredItems_callOnFunction(tempName, vargv);
 		}
 	}
 
-
-	o.LayeredItems_getIcons <- function()
+	o.LayeredItems_getUILayers <- function( _forceSmallIcon, _owner )
 	{
-		return []; // should be overwritten by children
-		// used to stack layers icons
-		// needs js hooks for assignItemToSlot in character_screen_paperdoll_module, character_screen_inventory_list_module
-		// tactical_combat_result_screen_loot_panel and world_town_screen_shop_dialog_module.
-
-		// also need handling for named layers
+		return this.LayeredItems_getLayerContainer().map(@(_l) ::UIDataHelper.convertItemToUIData(_l, _forceSmallIcon, _owner));
 	}
 
-	o.LayeredItems_getIconsLarge <- function()
+	o.LayeredItems_attachLayer <- function( _layer, _type = null )
 	{
-		return []; // should be overwritten by children
-	}
-
-	o.LayeredItems_attachLayer <- function( _layer, _type )
-	{
-		if (this.m.LayeredItems_Layers[_type] == null)
+		if (_type == null)
+		{
+			foreach (type in _layer.LayeredItems_getTypesArray())
+			{
+				if (this.LayeredItems_hasAttachedType(type)) continue;
+				_type = type;
+				break;
+			}
+			// error handling here TODO
+		}
+		local layer = ::LayeredItems.getLayerFromType(_type);
+		if (this.LayeredItems_getLayerContainer()[layer] == null)
 		{
 			if (_layer.LayeredItems_attach(this, _type))
 			{
-				this.m.LayeredItems_Layers[_type] = _layer;
+				this.LayeredItems_getLayerContainer()[layer] = _layer;
+				return true;
 			}
 		}
-		this.updateAppearance()
+		return false;
+	}
+
+	o.LayeredItems_detachLayerByType <- function( _type )
+	{
+		local layer = ::LayeredItems.getLayerFromType(_type);
+		local ret = this.LayeredItems_getLayerContainer()[layer];
+		this.LayeredItems_getLayerContainer()[layer] = null;
+		ret.LayeredItems_detach();
+		return ret;
+	}
+
+	o.LayeredItems_detachLayer <- function( _layerObject ) // will throw if _layerObject is not attached
+	{
+		this.LayeredItems_detachLayerByType(_layerObject.LayeredItems_getCurrentType());
+	}
+
+	o.LayeredItems_hasAttachedLayer <- function( _layerObject )
+	{
+		foreach (layer in this.LayeredItems_getLayers())
+		{
+			if (layer == _layerObject) return true;
+		}
+		return false;
+	}
+
+	o.LayeredItems_hasAttachedType <- function( _type )
+	{
+		return this.LayeredItems_getLayerContainer()[::LayeredItems.getLayerFromType(_type)] != null;
 	}
 
 	o.setUpgrade <- function( _upgrade )
 	{
-		this.LayeredItems_attachLayer(_upgrade, "Attachment")
+		// this.LayeredItems_attachLayer(_upgrade, "Attachment") // needs some more code to handle conversion from upgrade to layer
 	}
 
 	local setCondition = ::mods_getMember(o, "setCondition");
 	// _a
-	o.setCondition <- function( ... )
+	o.setCondition <- function( _a )
 	{
-		vargv.insert(0, this);
+		if (_a > this.getConditionMax()) _a = this.getConditionMax();
+		else if (_a < 0) _a = 0;
 
-		local condition = vargv[1];
-		if (condition > this.getConditionMax()) condition = this.getConditionMax();
-		else if (condition < 0) condition = 0;
-
-		local difference = this.getCondition() - condition;
+		local difference = this.getCondition() - _a;
+		local layers = this.LayeredItems_getLayers();
 		if (difference == 0) return;
-		else if (difference > 0)
+		else if (difference < 0)
 		{
 			// bottom up
-			local currentLayerDifference = ::Math.min(difference, getConditionMax() - getConidtion());
+			local currentLayerDifference = ::Math.max(difference, getCondition.bindenv(this)() - getConditionMax.bindenv(this)());
 			difference -= currentLayerDifference;
-			vargv[1] = currentLayerDifference + getCondition();
-			setCondition.acall(vargv);
+			setCondition.bindenv(this)(getCondition.bindenv(this)() - currentLayerDifference);
 
-			for (local i = 0; i < ::LayeredItems.ArmorLayers.len(); ++i)
+			for (local i = 0; i < layers.len(); ++i)
 			{
-				if (difference <= 0) break;
-				local layer = this.m.LayeredItems_Layers[::LayeredItems.ArmorLayers[i]];
-				if (layer == null) continue;
-				currentLayerDifference = ::Math.min(difference, layer.getConditionMax() - layer.getCondition());
+				currentLayerDifference = ::Math.max(difference, layers[i].getCondition() - layers[i].getConditionMax());
 				difference -= currentLayerDifference;
-				vargv[1] = currentLayerDifference + layer.getCondition();
-				layer.setCondition.acall(vargv);
+				layers[i].setCondition(layers[i].getCondition() - currentLayerDifference);
 			}
 		}
 		else
 		{
 			local currentLayerDifference;
 			// top down
-			for (local i = ::LayeredItems.ArmorLayers.len() - 1; i > 0; --i)
+			for (local i = layers.len() - 1; i >= 0; --i)
 			{
-				if (difference >= 0) break;
-				local layer = this.m.LayeredItems_Layers[::LayeredItems.ArmorLayers[i]];
-				if (layer == null) continue;
-				currentLayerDifference = ::Math.min(difference, layer.getCondition());
+				currentLayerDifference = ::Math.min(difference, layers[i].getCondition());
 				difference -= currentLayerDifference;
-				vargv[1] = layer.getCondition() - currentLayerDifference;
-				layer.setCondition.acall(vargv);
+				layers[i].setCondition(layers[i].getCondition() - currentLayerDifference);
 			}
 
-			currentLayerDifference = ::Math.min(difference, getCondition());
+			currentLayerDifference = ::Math.min(difference, getCondition.bindenv(this)());
 			difference -= currentLayerDifference;
-			vargv[1] = getCondition() - currentLayerDifference;
-			setCondition.acall(vargv);
+			setCondition.bindenv(this)(getCondition.bindenv(this)() - currentLayerDifference);
 		}
 		if (difference != 0) throw "Difference was not 0"
 	}
 
-	// _a
-	o.setArmor <- function( ... )
+	o.getTooltip <- function()
 	{
-		vargv.insert(0, this);
-		this.setCondition.acall(vargv);
+		local description = this.getDescription();
+		foreach (layer in this.LayeredItems_getLayers())
+		{
+			description += " " + layer.getDescription();
+		}
+
+		local result = [
+			{
+				id = 1,
+				type = "title",
+				text = this.getName()
+			},
+			{
+				id = 2,
+				type = "description",
+				text = description
+			},
+			{
+				id = 66,
+				type = "text",
+				text = this.getValueString()
+			}
+		];
+
+		if (this.getIconLarge() != null)
+		{
+			result.push({
+				id = 3,
+				type = "image",
+				image = this.getIconLarge(),
+				isLarge = true
+			});
+		}
+		else
+		{
+			result.push({
+				id = 3,
+				type = "image",
+				image = this.getIcon()
+			});
+		}
+
+		result.push({
+			id = 4,
+			type = "progressbar",
+			icon = "ui/icons/armor_body.png",
+			value = this.getCondition(),
+			valueMax = this.getConditionMax(),
+			text = "" + this.getArmor() + " / " + this.getArmorMax() + "",
+			style = "armor-body-slim"
+		});
+
+		if (this.getStaminaModifier() < 0)
+		{
+			result.push({
+				id = 5,
+				type = "text",
+				icon = "ui/icons/fatigue.png",
+				text = "Maximum Fatigue [color=" + this.Const.UI.Color.NegativeValue + "]" + this.getStaminaModifier() + "[/color]"
+			});
+		}
+
+		foreach (layer in this.LayeredItems_getLayers())
+		{
+			layer.LayeredItems_addLayerTooltip(result)
+		}
+		return result;
 	}
 
-	o.updateAppearance <- function( ... )
+	o.setArmor <- function( _a )
 	{
-		vargv.insert(0, this);
-		if (this.getContainer() == null || !this.isEquipped() || ! this.m.ShowOnCharacter) return;
+		this.setCondition(_a);
+	}
+
+	o.updateAppearance <- function()
+	{
+		if (this.getContainer() == null || !this.isEquipped() || !this.m.ShowOnCharacter) return;
 
 		local appearance = this.getContainer().getAppearance();
 		if (this.getCondition() / this.getConditionMax() <= ::Const.Combat.ShowDamagedArmorThreshold && this.m.SpriteDamaged != null)
 		{
-			appearance[this.m.LayeredItems_Type] = this.m.SpriteDamaged;
+			appearance[this.m.LayeredItems.BaseSprite] = this.m.SpriteDamaged;
 		}
 		else if (this.m.Sprite != null)
 		{
-			appearance[this.m.LayeredItems_Type] = this.m.Sprite;
+			appearance[this.m.LayeredItems.BaseSprite] = this.m.Sprite;
 		}
 
-		foreach (layer in this.m.LayeredItems_Layers)
+		foreach (layer in this.LayeredItems_getLayers())
 		{
-			layer.updateAppearance.acall(vargv);
+			layer.updateAppearance();
 		}
+		this.getContainer().updateAppearance();
 	}
 	// Dumb overwrites below cuz Raps doesn't use set/getCondition -_- maybe we should fix that in MSU?
 
 	// _damage, _fatalityType, _attacker
-	o.onDamageReceived <- function( ... )
+	o.onDamageReceived <- function( _damage, _fatalityType, _attacker )
 	{
-		vargv.insert(0, this);
-		this.item.onDamageReceived.acall(vargv);
+		this.item.onDamageReceived(_damage, _fatalityType, _attacker);
 
-		local originalDamage = vargv[1];
+		local originalDamage = _damage;
 
-		foreach (layer in this.m.LayeredItems_Layers)
+		foreach (layer in this.LayeredItems_getLayers())
 		{
-			if (layer != null)
-			{
-				vargv[0] = layer;
-				vargv[1] = layer.onDamageReceived.acall(vargv);
-			}
+			_damage = layer.onDamageReceived(_damage, _fatalityType, _attacker);
 		}
 
 		if (this.getCondition() == 0) return;
 
-		this.setCondition(::Math.max(0, this.getCondition() - vargv[1]) * 1.0);
+		this.setCondition(::Math.max(0, this.getCondition() - _damage) * 1.0);
 
 		if (this.getCondition() == 0 && !this.m.IsIndestructible)
 		{
