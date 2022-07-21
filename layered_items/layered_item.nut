@@ -2,8 +2,7 @@
 {
 	o.m.LayeredItems <- {
 		Layers = [],
-		BlockedLayers = [],
-		// should probably also have an option for hidden layers
+		BlockedLayers = [], // not handled at all rn
 		BaseSprite = ""
 	}
 

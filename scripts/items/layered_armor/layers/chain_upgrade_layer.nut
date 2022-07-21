@@ -3,13 +3,14 @@ this.chain_upgrade_layer <- this.inherit("scripts/items/layered_armor/layers/arm
 	function create()
 	{
 		this.armor_layer.create();
-		this.m.ID = "armor_upgrade.mail_patch";
+		this.m.ID = "armor_layer.chain_upgrade";
 		this.m.Name = "Mail Patch";
 		this.m.Description = "A large patch of mail that can be added to any armor to further protect the most vulnerable areas.";
 		this.m.SlotType = this.Const.ItemSlot.Body;
 		this.m.Icon = "armor_upgrades/icon_upgrade_09.png";
 		this.m.IconLarge = "armor_upgrades/inventory_upgrade_09.png";
 		this.m.Sprite = "upgrade_09_back";
+		this.m.SpriteDamaged = "upgrade_09_back_damaged";
 
 		// this.m.SpriteFront = null;
 		// this.m.SpriteBack = "upgrade_09_back";
