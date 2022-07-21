@@ -10,7 +10,6 @@
 		o.m.Appearance[sprite] <- "";
 	}
 
-
 	local equip = o.equip;
 	o.equip = function( _item )
 	{

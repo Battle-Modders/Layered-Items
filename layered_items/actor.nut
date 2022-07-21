@@ -31,7 +31,6 @@
 			}
 		}
 
-
 		local ret = onInit();
 
 		if (hookedHere)
