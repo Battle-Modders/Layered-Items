@@ -151,4 +151,16 @@
 		this.item.onDamageReceived(_damage, _fatalityType, _attacker);
 		return _damage;
 	}
+
+	o.LayeredItems_serializeLayer <- function( _out )
+	{
+		_out.writeBool(this.m.LayeredItems.IsVisible);
+	}
+
+	o.LayeredItems_deserializeLayer <- function( _in )
+	{
+		this.m.LayeredItems.IsVisible = _in.readBool();
+	}
+
+	// front/back layers for attachments?
 }

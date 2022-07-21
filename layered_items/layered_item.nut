@@ -429,6 +429,38 @@
 		return ::Const.Items.ConditionColor[::Math.max(0, ::Math.floor(this.getCondition() / (this.getConditionMax() * 1.0) * (::Const.Items.ConditionColor.len() - 1)))];
 	}
 
+	o.LayeredItems_serializeLayers <- function( _out )
+	{
+		_out.writeU8(this.m.LayeredItems.Layers.len());
+		foreach (layer in this.m.LayeredItems.Layers)
+		{
+			if (layer == null)
+			{
+				_out.writeI32(0);
+			}
+			else
+			{
+				_out.writeI32(layer.ClassNameHash);
+				layer.onSerialize(_out);
+			}
+		}
+	}
+
+	o.LayeredItems_deserializeLayers <- function( _in )
+	{
+		local numLayers = _in.readU8();
+		for (local i = 0; i < numLayers; ++i) // no handling for decreasing the number of layers (increasing does work)
+		{
+			local classNameHash = _in.readI32();
+			if (classNameHash != 0)
+			{
+				local layer = ::new(::IO.scriptFilenameByHash(classNameHash));;
+				this.LayeredItems_attachLayer(layer);
+				layer.onDeserialize(_in);
+			}
+		}
+	}
+
 	// layered loot drops need work
 	// how to handle getSkills
 	// setUpgrade should instead attach to the Attachment layer, that should probably be handled in a separate armor hook though
