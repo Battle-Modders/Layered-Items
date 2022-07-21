@@ -4,11 +4,11 @@
 
 	o.LayeredItems_isLayered <- function()
 	{
-		return ::MSU.isIn("LayeredItems", this.m, true) && ::MSU.isIn("Layers", this.m.LayeredItems);
+		return ::MSU.isIn("LayeredItems", this.m, true) && "Layers" in this.m.LayeredItems;
 	}
 
 	o.LayeredItems_isLayer <- function()
 	{
-		return ::MSU.isIn("LayeredItems", this.m, true) && ::MSU.isIn("Type", this.m.LayeredItems);
+		return ::MSU.isIn("LayeredItems", this.m, true) && "Type" in this.m.LayeredItems;
 	}
 });
