@@ -235,11 +235,6 @@
 		return this.LayeredItems_getLayerContainer()[::LayeredItems.getLayerFromType(_type)] != null;
 	}
 
-	o.setUpgrade <- function( _upgrade )
-	{
-		// this.LayeredItems_attachLayer(_upgrade, "Attachment") // needs some more code to handle conversion from upgrade to layer
-	}
-
 	local setCondition = ::mods_getMember(o, "setCondition");
 	// _a
 	o.setCondition <- function( _a )

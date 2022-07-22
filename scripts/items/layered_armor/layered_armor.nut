@@ -6,6 +6,29 @@ this.layered_armor <- this.inherit("scripts/items/armor/armor", {
 		this.m.LayeredItems.BaseSprite = "Armor";
 	}
 
+	function setUpgrade( _upgrade )
+	{
+		local currentUpgrade = this.LayeredItems_getLayer(::LayeredItems.Armor.Layer.Attachment);
+		local actor = this.getContainer() == null ? null : this.getContainer().getActor();
+		if (currentUpgrade != null)
+		{
+			currentUpgrade.onUnequip();
+			currentUpgrade.setCurrentSlotType(::Const.ItemSlot.None);
+			local item = this.LayeredItems_detachLayerByType(::LayeredItems.Armor.LayerType.Attachment)
+			// needs work, should probably get added to stash or blocked if there aren't enough slots
+		}
+		local convertedItem = ::new("scripts/items/layered_armor/layers/vanilla_attachment");
+		convertedItem.init(_upgrade);
+		if (!this.LayeredItems_attachLayer(convertedItem)) return false;
+		if (actor != null)
+		{
+			convertedItem.setCurrentSlotType(this.getSlotType());
+			convertedItem.onEquip();
+			this.updateAppearance();
+		}
+		return true;
+	}
+
 	function onSerialize( _out )
 	{
 		this.armor.onSerialize(_out);
