@@ -6,6 +6,7 @@ this.vanilla_attachment <- this.inherit("scripts/items/layered_armor/layers/armo
 		this.armor_layer.create();
 		this.armor_upgrade <- ::new("scripts/items/armor_upgrades/armor_upgrade");
 		this.armor_upgrade.setdelegate(this.item);
+		this.armor_upgrade.item = this.item;
 		this.armor_upgrade.m.setdelegate(this.item.m);
 		this.m.LayeredItems.VanillaClassNameHash <- null;
 		this.m.LayeredItems.Type = ::LayeredItems.Armor.LayerType.Attachment;
