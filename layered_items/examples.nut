@@ -1,3 +1,64 @@
+::LayeredItems.setArmorDef <- function( _name, _layeredDefOrLayeredDefArray )
+{
+	::LayeredItems.Armor.Defs[_name] <- ::LayeredItems.parseItemDef(_layeredDefOrLayeredDefArray); // no merging
+}
+
+::LayeredItems.setArmorDefs <- function( _armorDefs )
+{
+	foreach (armorString, armorDef in _armorDefs)
+	{
+		::LayeredItems.setArmorDef(armorString, armorDef);
+	}
+}
+
+::LayeredItems.parseItemDef <- function( _layeredDefOrLayeredDefArray )
+{
+	local ret = ::MSU.Class.WeightedContainer();
+	if (typeof _layeredDefOrLayeredDefArray == "table") _layeredDefOrLayeredDefArray = [[1, _layeredDefOrLayeredDefArray]];
+	foreach (layeredDefPair in _layeredDefOrLayeredDefArray)
+	{
+		local layeredDef = {};
+		foreach (key, value in layeredDefPair[1])
+		{
+			if (value.len() != 0) layeredDef[key] <- ::MSU.Class.WeightedContainer(value);
+		}
+		if (!("Base" in layeredDef)) throw "Layered item def needs a defined base";
+		ret.add(layeredDef, layeredDefPair[0]);
+	}
+	return ret;
+}
+
+::LayeredItems.newArmorItem <- function( _scriptName )
+{
+	return ::LayeredItems.createItemFromDef(::LayeredItems.Armor.Defs[_scriptName]);
+}
+
+::LayeredItems.createItemFromDef <- function( _weightedContainerDef )
+{
+	local outfit = _weightedContainerDef.roll();
+	local ret = ::new(outfit.Base.roll());
+	foreach (key, value in outfit)
+	{
+		if (key == "Base") continue;
+		local layer = value.roll();
+		if (layer == null) continue;
+		ret.LayeredItems_attachLayer(::new(layer), ::LayeredItems[ret.LayeredItems_getBaseSprite()].LayerType[key]);
+	}
+	ret.m.LayeredItems.Fresh = true;
+	return ret;
+}
+
+::LayeredItems.setArmorDefs({
+	"scripts/items/armor/gambeson" : {
+		Base = [
+			[1, "scripts/items/layered_armor/layered_gambeson"]
+		],
+		Chain = [
+			[1, "scripts/items/layered_armor/layers/chain_upgrade_layer"]
+		],
+	},
+});
+
 // ::LayeredArmor.setArmorDefs(
 // {
 // 	"scripts/items/armor/vanillaArmor1" : [

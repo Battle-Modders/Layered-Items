@@ -32,6 +32,7 @@
 			"Tabard",
 			"Attachment"
 		] // might wanna add a description array as well ?
+		Defs = {}
 		function addLayer( _name )
 		{
 			// should be filled in
@@ -67,17 +68,6 @@
 	{
 		return ::Math.pow(2, _layer).tointeger();
 	}
-	setArmorDef = function(_scriptName, _arrayOfArraysWeightedContainers)
-	{
-		this.ArmorDefs[_scriptName] <- _arrayOfArraysWeightedContainers;
-	},
-	setArmorDefs = function(_table)
-	{
-		foreach (key, value in _table)
-		{
-			this.setarmorDef(key, value);
-		}
-	}
 }
 
 ::mods_registerMod(::LayeredItems.ID, ::LayeredItems.Version, ::LayeredItems.Name);
@@ -108,4 +98,16 @@
 	::mods_registerJS("layered_items/world_town_screen_shop_dialog_module.js")
 	::mods_registerCSS("layered_items/button.css");
 	::mods_registerCSS("layered_items/character_screen_paperdoll_module.css");
+
+	local new = ::new;
+	::new = function( _scriptName )
+	{
+		if (_scriptName in ::LayeredItems.Armor.Defs)
+		{
+			local ret = ::LayeredItems.newArmorItem(_scriptName);
+			return ret;
+		}
+		local ret = new(_scriptName);
+		return ret;
+	}
 });

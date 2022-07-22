@@ -3,7 +3,8 @@
 	o.m.LayeredItems <- {
 		Layers = [],
 		BlockedLayers = [], // not handled at all rn
-		BaseSprite = ""
+		BaseSprite = "",
+		Fresh = false // serialization stuffs
 	}
 
 	local create = o.create;
@@ -442,6 +443,7 @@
 
 	o.LayeredItems_deserializeLayers <- function( _in )
 	{
+		if (this.m.LayeredItems.Fresh) return;
 		local numLayers = _in.readU8();
 		for (local i = 0; i < numLayers; ++i) // no handling for decreasing the number of layers (increasing does work)
 		{
