@@ -83,18 +83,15 @@ CharacterScreenPaperdollModule.prototype.LayeredItems_createLayerButtonForEquipm
 		});
 	}, "layered-items-button layered-layer-button");
 	button.removeClass('button');
-	button.on('mouseup', function(_event)
+	var showHideButton = layout.createCustomButton('', function()
 	{
-		var disabled = $(this).attr('disabled');
-		if (disabled !== null && disabled !== 'disabled' && _event.button == 2)
+		var itemData = _slot.Container.data('item');
+		self.mDataSource.LayeredItems_notifyBackendVisionButtonClicked(itemData.entityId, itemData.itemId, _layer, function (_data)
 		{
-			var itemData = _slot.Container.data('item');
-			self.mDataSource.LayeredItems_notifyBackendVisionButtonClicked(itemData.entityId, itemData.itemId, _layer, function (_data)
-			{
-				self.mDataSource.updateBrother(_data);
-			});
-		}
-	})
+			self.mDataSource.updateBrother(_data);
+		});
+	}, 'layered-items-eye-button')
+	showHideButton.removeClass('button')
 }
 LayeredItems.CharacterScreenPaperdollModule_createEquipmentSlot = CharacterScreenPaperdollModule.prototype.createEquipmentSlot;
 CharacterScreenPaperdollModule.prototype.createEquipmentSlot = function (_slot, _parentDiv, _screenDiv)

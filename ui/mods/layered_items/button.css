@@ -25,10 +25,6 @@
 	background-size: 2.2rem 2.2rem;
 }
 
-.ui-control.layered-items-button.invisible-layer {
-	background-image: url("coui://gfx/mods/layered_items/layer_button_invisible.png");
-}
-
 .ui-control.layered-items-button > .label {
 	top: -0.2rem;
 	bottom: 0;
@@ -66,3 +62,37 @@
 	top: -0.2rem;
 	left: 0.1rem;
 }
+
+.ui-control.layered-items-eye-button
+{
+	width: 1.5rem;
+	height: 1.5rem;
+	position: relative;
+	top: -2.3rem;
+	left: 1.5rem;
+	z-index: 10;
+	background-image: url("coui://gfx/mods/layered_items/layer_visible.png");
+	background-size: 1.5rem 1.5rem;
+}
+
+.ui-control.layered-items-eye-button:hover,
+.ui-control.layered-items-eye-button.is-selected
+{
+	top: -2.1rem;
+	left: 1.7rem;
+	background-image: url("coui://gfx/mods/layered_items/layer_visible_hover.png");
+}
+
+.ui-control.layered-items-eye-button.invisible-layer
+{
+	background-image: url("coui://gfx/mods/layered_items/layer_hidden.png");
+}
+
+
+.ui-control.layered-items-eye-button.invisible-layer:hover,
+.ui-control.layered-items-eye-button.invisible-layer.is-selected
+{
+	background-image: url("coui://gfx/mods/layered_items/layer_hidden_hover.png");
+}
+
+

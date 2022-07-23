@@ -14,7 +14,9 @@ LayeredItems.assignPaperdollLayeredImage = function(_isBlocked)
 	var itemData = this.data('item');
 	var layerContainer = this.parent().find('> .layer-container');
 	var layerButtons = layerContainer.find('> .l-layered-layer-button > .layered-layer-button');
+	var layerShowHideButtons = layerContainer.find('> .l-layered-layer-button > .layered-items-eye-button');
 	layerButtons.unbindTooltip();
+	layerShowHideButtons.unbindTooltip();
 	if (itemData.layeredItems == undefined || itemData.layeredItems.type != "layered")
 	{
 		layerContainer.removeClass('display-block').addClass('display-none')
@@ -24,12 +26,23 @@ LayeredItems.assignPaperdollLayeredImage = function(_isBlocked)
 
 	itemData.layeredItems.layers.forEach(function (_layer, _idx)
 	{
-		var button = $(layerButtons[itemData.layeredItems.layers.length - _idx - 1]);
-		if (itemData.layeredItems.blocked[_idx]) button.removeClass('display-block').addClass('display-none');
-		else button.removeClass('display-none').addClass('display-block');
+		var invertedIdx = itemData.layeredItems.layers.length - _idx - 1;
+		var button = $(layerButtons[invertedIdx]);
+		var showHideButton = $(layerShowHideButtons[invertedIdx]);
+		if (itemData.layeredItems.blocked[_idx])
+		{
+			button.removeClass('display-block').addClass('display-none');
+			showHideButton.removeClass('display-block').addClass('display-none');
+			return;
+		}
+		else
+		{
+			button.removeClass('display-none').addClass('display-block');
+		}
 		button.attr('disabled', _layer == null);
 		if (_layer == null)
 		{
+			showHideButton.removeClass('display-block').addClass('display-none');
 			button.bindTooltip({
 				contentType : 'msu-generic',
 				modId : LayeredItems.ID,
@@ -41,6 +54,7 @@ LayeredItems.assignPaperdollLayeredImage = function(_isBlocked)
 		}
 		else
 		{
+			showHideButton.removeClass('display-none').addClass('display-block');
 			button.bindTooltip({
 				contentType : 'ui-item',
 				entityId : itemData.entityId,
@@ -56,11 +70,21 @@ LayeredItems.assignPaperdollLayeredImage = function(_isBlocked)
 				if (itemData.isImageSmall === true) layerImage.addClass('is-small');
 				if (_isBlocked === true) layerImage.addClass('is-blocked');
 				layersLayer.append(layerImage);
-				button.removeClass('invisible-layer');
+				showHideButton.removeClass('invisible-layer');
+				showHideButton.bindTooltip({
+					contentType : 'msu-generic',
+					modId : LayeredItems.ID,
+					elementId : "Visible.True"
+				});
 			}
 			else
 			{
-				button.addClass('invisible-layer')
+				showHideButton.addClass('invisible-layer');
+				showHideButton.bindTooltip({
+					contentType : 'msu-generic',
+					modId : LayeredItems.ID,
+					elementId : "Visible.False"
+				});
 			}
 		}
 	});
