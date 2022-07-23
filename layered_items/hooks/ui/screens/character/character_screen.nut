@@ -1,5 +1,15 @@
 ::mods_hookNewObjectOnce("ui/screens/character/character_screen", function (o)
 {
+	local helper_dropItemIntoStash = o.helper_dropItemIntoStash; // this should really be done JS side to prevent stutter but is very complex due to drag event handlers
+	o.helper_dropItemIntoStash = function( _data )
+	{
+		if (_data.targetItemIdx != null && _data.targetItem != null && _data.targetItem.LayeredItems_isLayer())
+		{
+			return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToEquipStashItem);
+		}
+		return helper_dropItemIntoStash(_data);
+	}
+
 	local general_onEquipStashItem = o.general_onEquipStashItem;
 	o.general_onEquipStashItem = function( _data )
 	{
