@@ -34,7 +34,7 @@
 		if (key == "Base") continue;
 		local layer = value.roll();
 		if (layer == null) continue;
-		ret.LayeredItems_attachLayer(::new(layer), ::LayeredItems[ret.LayeredItems_getBase()].LayerType[key]);
+		ret.LayeredItems_attachLayer(::new(layer), ::LayeredItems.Item[ret.LayeredItems_getBase()].LayerType[key]);
 	}
 	ret.m.LayeredItems.Fresh = true;
 	return ret;

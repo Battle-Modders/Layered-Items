@@ -39,7 +39,7 @@
 	{
 		foreach (baseName, item in ::LayeredItems.Item)
 		{
-			if (_scriptName in ::LayeredItems.Item[baseName])
+			if (_scriptName in ::LayeredItems.Item[baseName].Defs)
 			{
 				return ::LayeredItems.Item[baseName].replaceVanillaItem(_scriptName);
 			}
