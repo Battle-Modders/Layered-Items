@@ -152,8 +152,6 @@
 		"onBeforeDamageReceived",
 		"onDamageDealt",
 		"onShieldHit",
-		// "onUpdateProperties", unnecessary because since each layer has its own generic_item skill, they get handled together, this may not be desirable
-		"onTurnStart", // pretty sure a bunch of these functions are getting called multiple times since each layer has its own generic_item skill
 		"onUse",
 		"onTotalArmorChanged",
 		"onMovementFinished",
@@ -163,8 +161,6 @@
 		"onAddedToStash",
 		"onRemovedFromStash",
 
-		// MSU
-		// "onAfterUpdateProperties" unnecessary because since each layer has its own generic_item skill, they get handled together, this may not be desirable
 	]
 
 	foreach (functionName in callOnFunctions)
