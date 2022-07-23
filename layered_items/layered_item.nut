@@ -354,7 +354,7 @@
 		this.setCondition(_a);
 	}
 
-	o.updateAppearance <- function()
+	o.updateAppearance <- function() // <1ms
 	{
 		if (this.getContainer() == null || !this.isEquipped() || !this.m.ShowOnCharacter) return;
 

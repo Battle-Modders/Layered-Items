@@ -19,7 +19,6 @@ this.vanilla_attachment <- this.inherit("scripts/items/layered_armor/layers/armo
 		this.m.Name = _vanillaItem.m.Name;
 		this.m.Description = _vanillaItem.m.Description;
 		this.m.Value = _vanillaItem.m.Value;
-		this.m.SlotType = ::Const.ItemSlot.Body;
 
 		this.m.Icon = _vanillaItem.m.OverlayIcon;
 		this.m.IconLarge = _vanillaItem.m.OverlayIconLarge;

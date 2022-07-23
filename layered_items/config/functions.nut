@@ -40,16 +40,18 @@
 	return ret;
 }
 
-::LayeredItems.addLayeredItem <- function( _baseNameInItemContainer, _spriteName )
+::LayeredItems.addLayeredItem <- function( _baseNameInItemContainer, _spriteName, _JSSlotName )
 {
 	::LayeredItems.Item[_baseNameInItemContainer] <- { // maybe make this into a class at some point?
 		Layer = {},
 		LayerType = {},
 		Sprite = [],
 		Name = [],
+		JSCharacter = [],
 		Description = [],
 		Defs = {},
 		SpriteName = _spriteName,
+		JSSlotName = _JSSlotName,
 		replaceVanillaItem = function( _scriptName )
 		{
 			return ::LayeredItems.createItemFromDef(this.Defs[_scriptName]);
@@ -68,12 +70,13 @@
 	}
 }
 
-::LayeredItems.addLayerToItem <- function( _baseName, _layerName, _description )
+::LayeredItems.addLayerToItem <- function( _baseName, _layerName, _description, _JSCharacter )
 {
 	local idx = ::LayeredItems.Item[_baseName].Layer.len();
 	::LayeredItems.Item[_baseName].Layer[_layerName] <- idx;
 	::LayeredItems.Item[_baseName].LayerType[_layerName] <- ::LayeredItems.getTypeFromLayer(idx);
 	::LayeredItems.Item[_baseName].Sprite.push("LayeredItems_" + _baseName + "_" + _layerName);
 	::LayeredItems.Item[_baseName].Name.push(_layerName);
+	::LayeredItems.Item[_baseName].JSCharacter.push(_JSCharacter);
 	::LayeredItems.Item[_baseName].Description.push(_description);
 }

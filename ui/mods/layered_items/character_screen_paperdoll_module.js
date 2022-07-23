@@ -23,21 +23,12 @@ CharacterScreenPaperdollModule.prototype.removeItemFromSlot = function(_slot)
 	return ret;
 }
 
-LayeredItems.CharacterScreenPaperdollModule_createDIV = CharacterScreenPaperdollModule.prototype.createDIV;
-CharacterScreenPaperdollModule.prototype.createDIV = function (_parentDiv)
-{
-	this.mMiddleEquipmentSlots.Head.Layers = [null, null];
-	this.mMiddleEquipmentSlots.Body.Layers = [null, null, null, null, null]; // should probably automatically read from SQ
-
-	LayeredItems.CharacterScreenPaperdollModule_createDIV.call(this, _parentDiv);
-}
-
 CharacterScreenPaperdollModule.prototype.LayeredItems_createLayerButtonForEquipmentSlot = function (_slot, _parentDiv, _layer)
 {
 	var self = this;
 	var layout = $('<div class="l-layered-layer-button"/>');
 	_parentDiv.append(layout);
-	var button = layout.createTextButton((_layer + 1).toString(), function ()
+	var button = layout.createTextButton(LayeredItems.Items[_slot.SlotType].layers[_layer].jsCharacter, function ()
 	{
 		var itemData = _slot.Container.data('item')
 		self.mDataSource.LayeredItems_notifyBackendLayerButtonClicked(itemData.entityId, itemData.itemId, _layer, function (data)
@@ -109,8 +100,9 @@ LayeredItems.CharacterScreenPaperdollModule_createEquipmentSlot = CharacterScree
 CharacterScreenPaperdollModule.prototype.createEquipmentSlot = function (_slot, _parentDiv, _screenDiv)
 {
 	var ret = LayeredItems.CharacterScreenPaperdollModule_createEquipmentSlot.call(this, _slot, _parentDiv, _screenDiv);
-	if ("Layers" in _slot)
+	if (_slot.SlotType in LayeredItems.Items)
 	{
+		_slot.Layers = Array.apply(null, Array(LayeredItems.Items[_slot.SlotType].layers.length)).map(function () {});
 		var equipmentSlot = _parentDiv.find('> .l-slot-container.' + _slot.ContainerClasses.replace(" ", ".")).filter(":last");
 		var container = $('<div class="layer-container display-none"/>');
 		equipmentSlot.prepend(container);
