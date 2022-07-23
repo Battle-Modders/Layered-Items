@@ -140,8 +140,6 @@
 		{
 			local app = this.getContainer().getAppearance();
 			app[::LayeredItems.Item[this.LayeredItems_getBase()].Sprite[::LayeredItems.getLayerFromType(this.LayeredItems_getCurrentType())]] = "";
-			this.logInfo("onUnequip");
-			::MSU.Log.printData(app);
 			this.getContainer().updateAppearance() // this is really inefficient when unequipping the whole layered item. Maybe make a separate function that doesn't call this based on param?
 		}
 		this.item.onUnequip();
