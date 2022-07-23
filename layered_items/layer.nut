@@ -3,7 +3,7 @@
 	o.m.LayeredItems <- {
 		Type = null,
 		Parent = null,
-		BaseSprite = "",
+		Base = "",
 		CurrentType = null,
 		IsVisible = true
 	}
@@ -56,9 +56,9 @@
 		return this.m.LayeredItems.Type;
 	}
 
-	o.LayeredItems_getBaseSprite <- function()
+	o.LayeredItems_getBase <- function()
 	{
-		return this.m.LayeredItems.BaseSprite;
+		return this.m.LayeredItems.Base;
 	}
 
 	o.LayeredItems_isVisible <- function()
@@ -120,17 +120,17 @@
 
 		if (!this.LayeredItems_isVisible())
 		{
-			appearance[::LayeredItems[this.m.LayeredItems.BaseSprite].Sprite[::LayeredItems.getLayerFromType(this.LayeredItems_getCurrentType())]] = "";
+			appearance[::LayeredItems.Item[this.LayeredItems_getBase()].Sprite[::LayeredItems.getLayerFromType(this.LayeredItems_getCurrentType())]] = "";
 			return;
 		}
 
 		if (this.getCondition() / this.getConditionMax() <= ::Const.Combat.ShowDamagedArmorThreshold && this.m.SpriteDamaged != null)
 		{
-			appearance[::LayeredItems[this.m.LayeredItems.BaseSprite].Sprite[::LayeredItems.getLayerFromType(this.LayeredItems_getCurrentType())]] = this.m.SpriteDamaged; // needs to be improved
+			appearance[::LayeredItems.Item[this.LayeredItems_getBase()].Sprite[::LayeredItems.getLayerFromType(this.LayeredItems_getCurrentType())]] = this.m.SpriteDamaged; // needs to be improved
 		}
 		else if (this.m.Sprite != null)
 		{
-			appearance[::LayeredItems[this.m.LayeredItems.BaseSprite].Sprite[::LayeredItems.getLayerFromType(this.LayeredItems_getCurrentType())]] = this.m.Sprite; // needs to be improved
+			appearance[::LayeredItems.Item[this.LayeredItems_getBase()].Sprite[::LayeredItems.getLayerFromType(this.LayeredItems_getCurrentType())]] = this.m.Sprite; // needs to be improved
 		}
 	}
 
@@ -139,7 +139,9 @@
 		if (this.m.ShowOnCharacter)
 		{
 			local app = this.getContainer().getAppearance();
-			app[::LayeredItems[this.m.LayeredItems.BaseSprite].Sprite[::LayeredItems.getLayerFromType(this.LayeredItems_getCurrentType())]] = "";
+			app[::LayeredItems.Item[this.LayeredItems_getBase()].Sprite[::LayeredItems.getLayerFromType(this.LayeredItems_getCurrentType())]] = "";
+			this.logInfo("onUnequip");
+			::MSU.Log.printData(app);
 			this.getContainer().updateAppearance() // this is really inefficient when unequipping the whole layered item. Maybe make a separate function that doesn't call this based on param?
 		}
 		this.item.onUnequip();

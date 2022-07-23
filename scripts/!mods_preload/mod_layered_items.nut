@@ -2,72 +2,7 @@
 	ID = "mod_layered_items",
 	Version = "0.1.0",
 	Name = "Layered Items",
-	rawNew = ::new,
-	Armor = {
-		Layer = {
-			Chain = 0,
-			Plate = 1,
-			Cloak = 2,
-			Tabard = 3,
-			Attachment = 4
-		},
-		LayerType = {
-			Chain = 1,
-			Plate = 2,
-			Cloak = 4,
-			Tabard = 8,
-			Attachment = 16
-		},
-		Sprite = [
-			"LayeredItems_Armor_Chain",
-			"LayeredItems_Armor_Plate",
-			"LayeredItems_Armor_Cloak",
-			"LayeredItems_Armor_Tabard",
-			"LayeredItems_Armor_Attachment"
-		],
-		Name = [
-			"Chain",
-			"Plate",
-			"Cloak",
-			"Tabard",
-			"Attachment"
-		] // might wanna add a description array as well ?
-		Defs = {}
-		function addLayer( _name )
-		{
-			// should be filled in
-		}
-	}
-	Helmet = {
-		Layer = {
-			Top = 0,
-			Vanity = 1
-		}
-		LayerType = {
-			Top = 1,
-			Vanity = 2
-		}
-		Sprite = {
-			Top = "LayeredItems_Helmet_Top",
-			Vanity = "LayeredItems_Helmet_Vanity"
-		}
-		Name = [
-			"Top",
-			"Vanity",
-		]
-		function addLayer( _name )
-		{
-			// should be filled in
-		}
-	}
-	function getLayerFromType( _type )
-	{
-		return (log(_type) / log(2)).tointeger();
-	}
-	function getTypeFromLayer( _layer )
-	{
-		return ::Math.pow(2, _layer).tointeger();
-	}
+	Item = {} // Armor, helmet and other go in here
 }
 
 ::mods_registerMod(::LayeredItems.ID, ::LayeredItems.Version, ::LayeredItems.Name);
@@ -99,15 +34,16 @@
 	::mods_registerCSS("layered_items/button.css");
 	::mods_registerCSS("layered_items/character_screen_paperdoll_module.css");
 
-	local new = ::new;
+	local new = ::new; // big boi dangerous hook
 	::new = function( _scriptName )
 	{
-		if (_scriptName in ::LayeredItems.Armor.Defs)
+		foreach (baseName, item in ::LayeredItems.Item)
 		{
-			local ret = ::LayeredItems.newArmorItem(_scriptName);
-			return ret;
+			if (_scriptName in ::LayeredItems.Item[baseName])
+			{
+				return ::LayeredItems.Item[baseName].replaceVanillaItem(_scriptName);
+			}
 		}
-		local ret = new(_scriptName);
-		return ret;
+		return new(_scriptName);
 	}
 });

@@ -3,7 +3,7 @@
 	o.m.LayeredItems <- {
 		Layers = [],
 		BlockedLayers = [], // not handled at all rn
-		BaseSprite = "",
+		Base = "",
 		Fresh = false // serialization stuffs
 	}
 
@@ -11,8 +11,8 @@
 	o.create = function()
 	{
 		create();
-		this.m.LayeredItems.Layers = array(::LayeredItems[this.m.LayeredItems.BaseSprite].Layer.len());
-		this.m.LayeredItems.BlockedLayers = array(::LayeredItems[this.m.LayeredItems.BaseSprite].Layer.len(), false);
+		this.m.LayeredItems.Layers = array(::LayeredItems.Item[this.LayeredItems_getBase()].Layer.len());
+		this.m.LayeredItems.BlockedLayers = array(::LayeredItems.Item[this.LayeredItems_getBase()].Layer.len(), false);
 	}
 
 	o.LayeredItems_getLayers <- function()
@@ -30,9 +30,9 @@
 		return this.LayeredItems_getLayerContainer()[_layer];
 	}
 
-	o.LayeredItems_getBaseSprite <- function()
+	o.LayeredItems_getBase <- function()
 	{
-		return this.m.LayeredItems.BaseSprite;
+		return this.m.LayeredItems.Base;
 	}
 
 	// o.LayeredItems_returnTrueIfAnyTrue <- function( _function, _argsArray )
@@ -153,7 +153,7 @@
 		"onDamageDealt",
 		"onShieldHit",
 		// "onUpdateProperties", unnecessary because since each layer has its own generic_item skill, they get handled together, this may not be desirable
-		"onTurnStart",
+		"onTurnStart", // pretty sure a bunch of these functions are getting called multiple times since each layer has its own generic_item skill
 		"onUse",
 		"onTotalArmorChanged",
 		"onMovementFinished",
@@ -361,11 +361,11 @@
 		local appearance = this.getContainer().getAppearance();
 		if (this.getCondition() / this.getConditionMax() <= ::Const.Combat.ShowDamagedArmorThreshold && this.m.SpriteDamaged != null)
 		{
-			appearance[this.m.LayeredItems.BaseSprite] = this.m.SpriteDamaged;
+			appearance[this.LayeredItems_getBase()] = this.m.SpriteDamaged;
 		}
 		else if (this.m.Sprite != null)
 		{
-			appearance[this.m.LayeredItems.BaseSprite] = this.m.Sprite;
+			appearance[this.LayeredItems_getBase()] = this.m.Sprite;
 		}
 
 		foreach (layer in this.LayeredItems_getLayers())

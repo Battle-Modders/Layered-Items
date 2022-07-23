@@ -9,7 +9,7 @@ this.vanilla_attachment <- this.inherit("scripts/items/layered_armor/layers/armo
 		this.armor_upgrade.item = this.item;
 		this.armor_upgrade.m.setdelegate(this.item.m);
 		this.m.LayeredItems.VanillaClassNameHash <- null;
-		this.m.LayeredItems.Type = ::LayeredItems.Armor.LayerType.Attachment;
+		this.m.LayeredItems.Type = ::LayeredItems.Item.Armor.LayerType.Attachment;
 	}
 
 	function init( _vanillaItem )

@@ -22,6 +22,6 @@ this.chain_upgrade_layer <- this.inherit("scripts/items/layered_armor/layers/arm
 		this.m.Condition = 20;
 		this.m.ConditionMax = 20;
 		this.m.StaminaModifier = -2;
-		this.m.LayeredItems.Type = ::LayeredItems.Armor.LayerType.Chain | ::LayeredItems.Armor.LayerType.Attachment;
+		this.m.LayeredItems.Type = ::LayeredItems.Item.Armor.LayerType.Chain | ::LayeredItems.Item.Armor.LayerType.Attachment;
 	}
 });

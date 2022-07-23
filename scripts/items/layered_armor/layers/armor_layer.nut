@@ -4,7 +4,7 @@ this.armor_layer <- this.inherit("scripts/items/armor/armor", {
 	function create()
 	{
 		this.armor.create();
-		this.m.LayeredItems.BaseSprite = "Armor";
+		this.m.LayeredItems.Base = "Armor";
 		this.m.SlotType = ::Const.ItemSlot.Body;
 	}
 

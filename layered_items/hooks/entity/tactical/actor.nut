@@ -13,18 +13,14 @@
 			this.addSprite = function(_sprite)
 			{
 				local ret = addSprite(_sprite);
-				if (_sprite == "helmet")
+				foreach (item in ::LayeredItems.Item)
 				{
-					foreach (sprite in ::LayeredItems.Helmet.Sprite)
+					if (item.SpriteName == _sprite)
 					{
-						addSprite(sprite);
-					}
-				}
-				else if (_sprite == "armor")
-				{
-					foreach (sprite in ::LayeredItems.Armor.Sprite)
-					{
-						addSprite(sprite);
+						foreach (sprite in item.Sprite)
+						{
+							addSprite(sprite);
+						}
 					}
 				}
 				return ret;
@@ -56,24 +52,17 @@
 
 		if (hookedHere)
 		{
-			if (this.hasSprite("helmet"))
+			foreach (item in ::LayeredItems.Item)
 			{
-				local flip = this.getSprite("helmet").isFlippedHorizontally();
-				foreach (sprite in ::LayeredItems.Helmet.Sprite)
+				if (this.hasSprite(item.SpriteName))
 				{
-					this.getSprite(sprite).setHorizontalFlipping(flip)
+					local flip = this.getSprite(item.SpriteName).isFlippedHorizontally();
+					foreach (sprite in item.Sprite)
+					{
+						this.getSprite(sprite).setHorizontalFlipping(flip);
+					}
 				}
 			}
-
-			if (this.hasSprite("armor"))
-			{
-				local flip = this.getSprite("armor").isFlippedHorizontally();
-				foreach (sprite in ::LayeredItems.Armor.Sprite)
-				{
-					this.getSprite(sprite).setHorizontalFlipping(flip)
-				}
-			}
-
 			delete this.m.LayeredItems_HookOnce;
 		}
 
@@ -86,47 +75,29 @@
 	local onAppearanceChanged = o.onAppearanceChanged;
 	o.onAppearanceChanged = function( _appearance, _setDirty = true )
 	{
-		if (!this.m.IsAlive || this.m.IsDying)
-		{
-			return;
-		}
+		if (!this.m.IsAlive || this.m.IsDying) return;
+		local ret = onAppearanceChanged(_appearance, _setDirty);
 
-		foreach (sprite in ::LayeredItems.Helmet.Sprite)
+		foreach (key, item in ::LayeredItems.Item)
 		{
-			if (this.hasSprite(sprite))
+			if (!this.hasSprite(item.SpriteName)) continue;
+			local parentSprite = this.getSprite(item.SpriteName);
+			foreach (sprite in item.Sprite)
 			{
-				if (_appearance[sprite] != "" && !this.m.IsHidingHelmet)
-				{
-					local layer = this.getSprite(sprite);
-					layer.setBrush(_appearance[sprite]);
-					layer.Color = _appearance.HelmetColor;
-					layer.Visible = true;
-				}
-				else
-				{
-					this.getSprite(sprite).Visible = false;
-				}
-			}
-		}
-
-		foreach (sprite in ::LayeredItems.Armor.Sprite)
-		{
-			if (this.hasSprite(sprite))
-			{
+				if (!this.hasSprite(sprite)) continue; // should never happen cuz of earlier check but just in case
+				local layer = this.getSprite(sprite);
 				if (_appearance[sprite] != "")
 				{
-					local layer = this.getSprite(sprite);
 					layer.setBrush(_appearance[sprite]);
-					layer.Color = _appearance.ArmorColor;
-					layer.Visible = true;
+					layer.Color = this.createColor("#ffffff");
+					layer.Visible = parentSprite.Visible;
 				}
 				else
 				{
-					this.getSprite(sprite).Visible = false;
+					layer.Visible = false;
 				}
 			}
 		}
-
-		return onAppearanceChanged(_appearance, _setDirty);
+		return ret;
 	}
 });

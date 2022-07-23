@@ -3,18 +3,18 @@ this.layered_armor <- this.inherit("scripts/items/armor/armor", {
 	function create()
 	{
 		this.armor.create();
-		this.m.LayeredItems.BaseSprite = "Armor";
+		this.m.LayeredItems.Base = "Armor";
 	}
 
 	function setUpgrade( _upgrade )
 	{
-		local currentUpgrade = this.LayeredItems_getLayer(::LayeredItems.Armor.Layer.Attachment);
+		local currentUpgrade = this.LayeredItems_getLayer(::LayeredItems.Item.Armor.Layer.Attachment);
 		local actor = this.getContainer() == null ? null : this.getContainer().getActor();
 		if (currentUpgrade != null)
 		{
 			currentUpgrade.onUnequip();
 			currentUpgrade.setCurrentSlotType(::Const.ItemSlot.None);
-			local item = this.LayeredItems_detachLayerByType(::LayeredItems.Armor.LayerType.Attachment)
+			local item = this.LayeredItems_detachLayerByType(::LayeredItems.Item.Armor.LayerType.Attachment)
 			// needs work, should probably get added to stash or blocked if there aren't enough slots
 		}
 		local convertedItem = ::new("scripts/items/layered_armor/layers/vanilla_attachment");

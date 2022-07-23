@@ -14,12 +14,12 @@
 				{
 					id = 1,
 					type = "title",
-					text = ::LayeredItems[parentItem.LayeredItems_getBaseSprite()].Name[_data.layer]
+					text = ::LayeredItems.Item[parentItem.LayeredItems_getBase()].Name[_data.layer]
 				},
 				{
 					id = 2,
 					type = "description",
-					text = "Placeholder for layer description"
+					text = ::LayeredItems.Item[parentItem.LayeredItems_getBase()].Description[_data.layer]
 				}
 			]
 		}

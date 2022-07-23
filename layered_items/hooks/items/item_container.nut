@@ -1,13 +1,11 @@
 ::mods_hookNewObject("items/item_container", function (o)
 {
-	foreach (sprite in ::LayeredItems.Armor.Sprite)
+	foreach (item in ::LayeredItems.Item)
 	{
-		o.m.Appearance[sprite] <- "";
-	}
-
-	foreach (sprite in ::LayeredItems.Helmet.Sprite)
-	{
-		o.m.Appearance[sprite] <- "";
+		foreach (sprite in item.Sprite)
+		{
+			o.m.Appearance[sprite] <- "";
+		}
 	}
 
 	local equip = o.equip;
