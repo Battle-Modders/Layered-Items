@@ -25,6 +25,8 @@ LayeredItems.assignPaperdollLayeredImage = function(_isBlocked)
 	itemData.layeredItems.layers.forEach(function (_layer, _idx)
 	{
 		var button = $(layerButtons[itemData.layeredItems.layers.length - _idx - 1]);
+		if (itemData.layeredItems.blocked[_idx]) button.removeClass('display-block').addClass('display-none');
+		else button.removeClass('display-none').addClass('display-block');
 		button.attr('disabled', _layer == null);
 		if (_layer == null)
 		{

@@ -8,6 +8,7 @@ this.layered_armor <- this.inherit("scripts/items/armor/armor", {
 
 	function setUpgrade( _upgrade )
 	{
+		if (this.LayeredItems_isLayerBlocked(::LayeredItems.Item.Armor.Layer.Attachment)) return false;
 		local currentUpgrade = this.LayeredItems_getLayer(::LayeredItems.Item.Armor.Layer.Attachment);
 		local actor = this.getContainer() == null ? null : this.getContainer().getActor();
 		if (currentUpgrade != null)

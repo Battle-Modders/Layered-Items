@@ -2,7 +2,7 @@
 {
 	o.m.LayeredItems <- {
 		Layers = [],
-		BlockedLayers = [], // not handled at all rn
+		Blocked = [], // not handled at all rn
 		Base = "",
 		Fresh = false // serialization stuffs
 	}
@@ -12,7 +12,7 @@
 	{
 		create();
 		this.m.LayeredItems.Layers = array(::LayeredItems.Item[this.LayeredItems_getBase()].Layer.len());
-		this.m.LayeredItems.BlockedLayers = array(::LayeredItems.Item[this.LayeredItems_getBase()].Layer.len(), false);
+		this.m.LayeredItems.Blocked = array(::LayeredItems.Item[this.LayeredItems_getBase()].Layer.len(), false);
 	}
 
 	o.LayeredItems_getLayers <- function()
@@ -28,6 +28,26 @@
 	o.LayeredItems_getLayer <- function( _layer )
 	{
 		return this.LayeredItems_getLayerContainer()[_layer];
+	}
+
+	o.LayeredItems_isLayerBlocked <- function( _layer )
+	{
+		return this.m.LayeredItems.Blocked[_layer];
+	}
+
+	o.LayeredItems_isTypeBlocked <- function( _type )
+	{
+		return this.LayeredItems_isLayerBlocked(::LayeredItems.getLayerFromType(_type));
+	}
+
+	o.LayeredItems_setLayerBlocked <- function( _layer, _blocked )
+	{
+		this.m.LayeredItems.Blocked[_layer] = _blocked;
+	}
+
+	o.LayeredItems_getBlockedArray <- function()
+	{
+		return this.m.LayeredItems.Blocked;
 	}
 
 	o.LayeredItems_getBase <- function()
@@ -186,14 +206,15 @@
 		{
 			foreach (type in _layer.LayeredItems_getTypesArray())
 			{
-				if (this.LayeredItems_hasAttachedType(type)) continue;
+				if (this.LayeredItems_hasAttachedType(type) || this.LayeredItems_isTypeBlocked(type)) continue;
 				_type = type;
 				break;
 			}
 			// error handling here TODO
 		}
+		if (_type == null) return false;
 		local layer = ::LayeredItems.getLayerFromType(_type);
-		if (this.LayeredItems_getLayerContainer()[layer] == null)
+		if (this.LayeredItems_getLayerContainer()[layer] == null && !this.LayeredItems_isLayerBlocked(layer))
 		{
 			if (_layer.LayeredItems_attach(this, _type))
 			{
@@ -423,7 +444,7 @@
 	o.LayeredItems_serializeLayers <- function( _out )
 	{
 		_out.writeU8(this.m.LayeredItems.Layers.len());
-		foreach (layer in this.m.LayeredItems.Layers)
+		foreach (i, layer in this.m.LayeredItems.Layers)
 		{
 			if (layer == null)
 			{
@@ -434,6 +455,7 @@
 				_out.writeI32(layer.ClassNameHash);
 				layer.onSerialize(_out);
 			}
+			_out.writeBool(this.m.LayeredItems.Blocked[i]);
 		}
 	}
 
@@ -450,6 +472,7 @@
 				this.LayeredItems_attachLayer(layer);
 				layer.onDeserialize(_in);
 			}
+			this.m.LayeredItems.Blocked[i] = _in.readBool();
 		}
 	}
 

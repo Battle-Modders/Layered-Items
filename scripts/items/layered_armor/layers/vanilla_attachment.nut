@@ -63,5 +63,4 @@ this.vanilla_attachment <- this.inherit("scripts/items/layered_armor/layers/armo
 		this.init(vanillaItem);
 		this.armor_layer.onDeserialize(_in);
 	}
-
 });

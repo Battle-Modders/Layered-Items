@@ -18,14 +18,14 @@
 
 			foreach (type in _item.LayeredItems_getTypesArray())
 			{
-				if (parentItem.LayeredItems_hasAttachedType(type)) continue;
+				if (parentItem.LayeredItems_hasAttachedType(type) || parentItem.LayeredItems_isTypeBlocked(type)) continue;
 
 				if (_item.getContainer() != null)
 				{
 					_item.getContainer().unequip(_item);
 				}
 
-				parentItem.LayeredItems_attachLayer(_item, type);
+				if (!parentItem.LayeredItems_attachLayer(_item, type)) return false;
 
 				_item.setCurrentSlotType(_item.getSlotType());
 

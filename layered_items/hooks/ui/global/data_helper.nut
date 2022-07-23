@@ -10,6 +10,7 @@
 		{
 			ret.layeredItems <- {
 				layers = _item.LayeredItems_getUILayers(_forceSmallIcon, _owner),
+				blocked = _item.LayeredItems_getBlockedArray(),
 				type = "layered" // should be a const value automatically shared with JS
 			};
 		}
