@@ -359,10 +359,16 @@
 			});
 		}
 
+		local layerTooltips = {
+			id = 6,
+			type = "layer",
+			data = []
+		}
 		foreach (layer in this.LayeredItems_getLayers())
 		{
-			layer.LayeredItems_addLayerTooltip(result)
+			layer.LayeredItems_addLayerTooltip(layerTooltips.data)
 		}
+		result.push(layerTooltips);
 		return result;
 	}
 

@@ -16,6 +16,12 @@
 
 	o.LayeredItems_addLayerTooltip <- function( _result )
 	{
+		_result.push({
+			id = 3,
+			type = "name",
+			text = this.getName(),
+			isLarge = true
+		});
 		if (this.getIconLarge() != null)
 		{
 			_result.push({
