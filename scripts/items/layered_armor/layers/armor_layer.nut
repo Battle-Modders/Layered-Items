@@ -5,7 +5,6 @@ this.armor_layer <- this.inherit("scripts/items/armor/armor", {
 	{
 		this.armor.create();
 		this.m.LayeredItems.Base = "Armor";
-		this.m.SlotType = ::Const.ItemSlot.Body;
 	}
 
 	function updateVariant() // need to do this or else armor.nut updateVariant fires on deserialize which breaks sprites and icons

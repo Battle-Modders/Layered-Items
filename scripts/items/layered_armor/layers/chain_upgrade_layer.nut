@@ -6,7 +6,6 @@ this.chain_upgrade_layer <- this.inherit("scripts/items/layered_armor/layers/arm
 		this.m.ID = "armor_layer.chain_upgrade";
 		this.m.Name = "Mail Patch";
 		this.m.Description = "A large patch of mail that can be added to any armor to further protect the most vulnerable areas.";
-		this.m.SlotType = this.Const.ItemSlot.Body;
 		this.m.Icon = "armor_upgrades/icon_upgrade_09.png";
 		this.m.IconLarge = "armor_upgrades/inventory_upgrade_09.png";
 		this.m.Sprite = "upgrade_09_back";
@@ -22,6 +21,6 @@ this.chain_upgrade_layer <- this.inherit("scripts/items/layered_armor/layers/arm
 		this.m.Condition = 20;
 		this.m.ConditionMax = 20;
 		this.m.StaminaModifier = -2;
-		this.m.LayeredItems.Type = ::LayeredItems.Item.Armor.LayerType.Chain | ::LayeredItems.Item.Armor.LayerType.Attachment;
+		this.m.LayeredItems.Type = ::LayeredItems.Item.Armor.LayerType.Chain;
 	}
 });
