@@ -32,6 +32,7 @@
 	::mods_registerJS("layered_items/tactical_combat_result_screen_loot_panel.js")
 	::mods_registerJS("layered_items/world_town_screen_shop_dialog_module.js")
 	::mods_registerCSS("layered_items/button.css");
+	::mods_registerCSS("layered_items/item.css");
 	::mods_registerCSS("layered_items/character_screen_paperdoll_module.css");
 
 	local new = ::new; // big boi dangerous hook

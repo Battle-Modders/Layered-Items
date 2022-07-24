@@ -2,24 +2,36 @@ LayeredItems.createListItem = $.fn.createListItem;
 $.fn.createListItem = function(_withPriceLayer, _backgroundImage, _classes)
 {
 	var result = LayeredItems.createListItem.call(this, _withPriceLayer, _backgroundImage, _classes);
-	result.children('.image-layer:first').append($('<div class="layered-item-layer"/>'));
+	var imageLayer = result.find('> .image-layer').filter(':first');
+	imageLayer.append($('<div class="layered-item-layer"/>'));
+	imageLayer.append($('<div class="layered-item-type title-font font-color-title font-bottom-shadow font-bold">'));
 	return result;
 }
 
 LayeredItems.assignListItemLayeredImage = function()
 {
-	var layersLayer = this.find('> .image-layer > .layered-item-layer:first');
+	var imageLayer = this.find('> .image-layer');
+	var layersLayer = imageLayer.find('> .layered-item-layer').filter(':first');
+	var layerTypeLayer = imageLayer.find('> .layered-item-type').filter(':first');
 	layersLayer.empty();
+	layerTypeLayer.text('')
 	var itemData = this.data('item');
-	if (itemData.layeredItems == undefined || itemData.layeredItems.type != "layered") return;
+	if (itemData.layeredItems == undefined) return;
 
-	itemData.layeredItems.layers.forEach(function (_layer)
+	if (itemData.layeredItems.type == "layered")
 	{
-		if (_layer == null || !_layer.layeredItems.visible) return;
-		var layerImage = $('<img/>');
-		layerImage.attr('src', Path.ITEMS + _layer.imagePath);
+		itemData.layeredItems.layers.forEach(function (_layer)
+		{
+			if (_layer == null || !_layer.layeredItems.visible) return;
+			var layerImage = $('<img/>');
+			layerImage.attr('src', Path.ITEMS + _layer.imagePath);
 
-		if (itemData.isImageSmall === true) layerImage.addClass('is-small');
-		layersLayer.append(layerImage);
-	});
+			if (itemData.isImageSmall === true) layerImage.addClass('is-small');
+			layersLayer.append(layerImage);
+		});
+	}
+	else if (itemData.layeredItems.type == "layer")
+	{
+		layerTypeLayer.text(LayeredItems.Items[itemData.layeredItems.baseItem].layers[itemData.layeredItems.layer].jsCharacter);
+	}
 }

@@ -18,7 +18,9 @@
 		{
 			ret.layeredItems <- {
 				visible = _item.LayeredItems_isVisible(),
-				type = "layer"
+				type = "layer",
+				layer = ::LayeredItems.getLayerFromType(_item.LayeredItems_getType()),
+				baseItem = ::LayeredItems.Item[_item.LayeredItems_getBase()].JSSlotName
 			}
 		}
 
