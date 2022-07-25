@@ -34,7 +34,8 @@
 	::mods_registerCSS("layered_items/button.css");
 	::mods_registerCSS("layered_items/item.css");
 	::mods_registerCSS("layered_items/character_screen_paperdoll_module.css");
-	::mods_registerCSS("layered_items/tooltip.js");
+	::mods_registerJS("layered_items/tooltip.js");
+	::mods_registerCSS("layered_items/tooltip.css");
 
 	local new = ::new; // big boi dangerous hook
 	::new = function( _scriptName )

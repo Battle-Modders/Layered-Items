@@ -123,6 +123,22 @@
 
 	local getCondition = ::mods_getMember(o, "getCondition"); //needed later
 	local getConditionMax = ::mods_getMember(o, "getConditionMax"); //needed later
+	local getStaminaModifier = ::mods_getMember(o, "getStaminaModifier"); //needed later
+
+	o.LayeredItems_getBaseCondition <- function()
+	{
+		return getCondition.bindenv(this).call(this);
+	}
+
+	o.LayeredItems_getBaseConditionMax <- function()
+	{
+		return getConditionMax.bindenv(this).call(this);
+	}
+
+	o.LayeredItems_getBaseStaminaModifier <- function()
+	{
+		return getStaminaModifier.bindenv(this).call(this);
+	}
 
 	local addedValueFunctions = [
 		"getCondition",
@@ -358,17 +374,38 @@
 				text = "Maximum Fatigue [color=" + this.Const.UI.Color.NegativeValue + "]" + this.getStaminaModifier() + "[/color]"
 			});
 		}
-
-		local layerTooltips = {
-			id = 6,
-			type = "layer",
-			data = []
-		}
-		foreach (layer in this.LayeredItems_getLayers())
+		if (this.LayeredItems_getLayers().len() > 0)
 		{
-			layer.LayeredItems_addLayerTooltip(layerTooltips.data)
+			result.push({
+				id = 6,
+				type = "progressbar",
+				icon = "ui/icons/armor_body.png",
+				value = this.LayeredItems_getBaseCondition(),
+				valueMax = this.LayeredItems_getBaseConditionMax(),
+				text = "" + this.Math.floor(this.LayeredItems_getBaseCondition()) + " / " + this.Math.floor(this.LayeredItems_getBaseConditionMax()) + "",
+				style = "armor-body-slim"
+			});
+
+			if (this.LayeredItems_getBaseStaminaModifier() < 0)
+			{
+				result.push({
+					id = 7,
+					type = "text",
+					icon = "ui/icons/fatigue.png",
+					text = "Maximum Fatigue [color=" + this.Const.UI.Color.NegativeValue + "]" + this.LayeredItems_getBaseStaminaModifier() + "[/color]"
+				});
+			}
+			local layerTooltips = {
+				id = 8,
+				type = "layer",
+				data = []
+			}
+			foreach (layer in this.LayeredItems_getLayers())
+			{
+				layer.LayeredItems_addLayerTooltip(layerTooltips.data)
+			}
+			result.push(layerTooltips);
 		}
-		result.push(layerTooltips);
 		return result;
 	}
 

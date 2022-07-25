@@ -16,40 +16,55 @@
 
 	o.LayeredItems_addLayerTooltip <- function( _result )
 	{
-		_result.push({
-			id = 3,
-			type = "name",
-			text = this.getName(),
-			isLarge = true
-		});
+		local ret = [];
+		local main =
+		{
+			id = 1,
+			type = "main",
+			name = this.getName(),
+			image = null,
+			isLarge = false,
+			durability = this.Math.floor(this.getCondition()),
+			durabilityMax = this.Math.floor(this.getConditionMax())
+		}
 		if (this.getIconLarge() != null)
 		{
-			_result.push({
-				id = 4,
-				type = "image",
-				image = this.getIconLarge(),
-				isLarge = true
-			});
+
+			main.image = this.getIconLarge()
 		}
 		else
 		{
-			_result.push({
-				id = 4,
-				type = "image",
-				image = this.getIcon()
-			});
+			main.image = this.getIcon()
 		}
+		ret.push(main)
 		if (this.getConditionMax() != 0)
 		{
-			_result.push({
+			ret.push({
 				id = 5,
 				type = "progressbar",
+				icon = "ui/icons/armor_body.png",
 				value = this.getCondition(),
 				valueMax = this.getConditionMax(),
 				text = this.Math.floor(this.getCondition()) + " / " + this.Math.floor(this.getConditionMax()),
 				style = "armor-body-slim"
 			})
 		}
+		if (this.getStaminaModifier() != 0)
+		{
+			ret.push({
+				id = 5,
+				type = "text",
+				icon = "ui/icons/fatigue.png",
+				text = "Maximum Fatigue [color=" + this.Const.UI.Color.NegativeValue + "]" + this.getStaminaModifier() + "[/color]"
+			});
+		}
+
+		if ("onArmorTooltip" in this)
+		{
+			this.onArmorTooltip(ret);
+		}
+		_result.push(ret);
+		return ret;
 	}
 
 	o.LayeredItems_getCurrentType <- function()
