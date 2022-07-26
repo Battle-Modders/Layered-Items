@@ -45,8 +45,7 @@ TooltipModule.prototype.addLayeredArmorDiv = function(_data)
 		img.css("position", "absolute");
 		img.css("top", "0");
 		img.css("left", "0");
-		var zIndex = _data.length - 1 == idx ? 0 : idx; //base layer needs to go to bottom
-		img.css("z-index", zIndex );
+		img.css("z-index", idx );
 
 		var nameDiv = $('<div class="layer-item-title-container"></div>').appendTo(rightDiv);
 		var text = $('<div class="title title-font-normal font-bold font-color-ink"></div>').appendTo(nameDiv);

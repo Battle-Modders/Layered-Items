@@ -377,11 +377,11 @@
 				type = "layer",
 				data = []
 			}
+			this.LayeredItems_addBaseLayerTooltip(layerTooltips.data);
 			foreach (layer in this.LayeredItems_getLayers())
 			{
 				layer.LayeredItems_addLayerTooltip(layerTooltips.data)
 			}
-			this.LayeredItems_addBaseLayerTooltip(layerTooltips.data); //add last so it shows up first
 			result.push(layerTooltips);
 		}
 		return result;
