@@ -314,10 +314,6 @@
 	o.getTooltip <- function()
 	{
 		local description = this.getDescription();
-		foreach (layer in this.LayeredItems_getLayers())
-		{
-			description += " " + layer.getDescription();
-		}
 
 		local result = [
 			{
@@ -376,25 +372,6 @@
 		}
 		if (this.LayeredItems_getLayers().len() > 0)
 		{
-			result.push({
-				id = 6,
-				type = "progressbar",
-				icon = "ui/icons/armor_body.png",
-				value = this.LayeredItems_getBaseCondition(),
-				valueMax = this.LayeredItems_getBaseConditionMax(),
-				text = "" + this.Math.floor(this.LayeredItems_getBaseCondition()) + " / " + this.Math.floor(this.LayeredItems_getBaseConditionMax()) + "",
-				style = "armor-body-slim"
-			});
-
-			if (this.LayeredItems_getBaseStaminaModifier() < 0)
-			{
-				result.push({
-					id = 7,
-					type = "text",
-					icon = "ui/icons/fatigue.png",
-					text = "Maximum Fatigue [color=" + this.Const.UI.Color.NegativeValue + "]" + this.LayeredItems_getBaseStaminaModifier() + "[/color]"
-				});
-			}
 			local layerTooltips = {
 				id = 8,
 				type = "layer",
@@ -404,9 +381,52 @@
 			{
 				layer.LayeredItems_addLayerTooltip(layerTooltips.data)
 			}
+			this.LayeredItems_addBaseLayerTooltip(layerTooltips.data); //add last so it shows up first
 			result.push(layerTooltips);
 		}
 		return result;
+	}
+
+	o.LayeredItems_addBaseLayerTooltip <- function( _result )
+	{
+		local ret = [];
+		local main =
+		{
+			id = 1,
+			type = "main",
+			name = this.getName()  + " (Base)",
+			image = null,
+		}
+		if (this.getIconLarge() != null)
+		{
+
+			main.image = this.getIconLarge()
+		}
+		else
+		{
+			main.image = this.getIcon()
+		}
+		ret.push(main)
+		if (this.LayeredItems_getBaseStaminaModifier() != 0)
+		{
+			ret.push({
+				id = 5,
+				type = "text",
+				icon = "ui/icons/fatigue.png",
+				text = "Maximum Fatigue [color=" + this.Const.UI.Color.NegativeValue + "]" + this.LayeredItems_getBaseStaminaModifier() + "[/color]"
+			});
+		}
+		ret.push({
+			id = 6,
+			type = "progressbar",
+			icon = "ui/icons/armor_body.png",
+			value = this.LayeredItems_getBaseCondition(),
+			valueMax = this.LayeredItems_getBaseConditionMax(),
+			text = "" + this.Math.floor(this.LayeredItems_getBaseCondition()) + " / " + this.Math.floor(this.LayeredItems_getBaseConditionMax()) + "",
+			style = "armor-body-slim"
+		});
+		_result.push(ret);
+		return ret;
 	}
 
 	o.setArmor <- function( _a )

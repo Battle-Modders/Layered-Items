@@ -23,9 +23,6 @@
 			type = "main",
 			name = this.getName(),
 			image = null,
-			isLarge = false,
-			durability = this.Math.floor(this.getCondition()),
-			durabilityMax = this.Math.floor(this.getConditionMax())
 		}
 		if (this.getIconLarge() != null)
 		{

@@ -1,15 +1,14 @@
-console.error("hook runs")
-var buildFromData = TooltipModule.prototype.buildFromData
+LayeredItems.buildFromData = TooltipModule.prototype.buildFromData
 TooltipModule.prototype.buildFromData = function(_data, _shouldBeUpdated, _contentType)
 {
 	var self = this;
-	console.error("runs")
-	buildFromData.call(this, _data, _shouldBeUpdated, _contentType);
-	var hasLayer = false;
+	LayeredItems.buildFromData.call(this, _data, _shouldBeUpdated, _contentType);
 	$.each(_data, function(idx, value)
 	{
 		if (value.type == "layer")
+		{
 			return self.addLayeredArmorDiv(value.data);
+		}
 	})
 }
 
@@ -17,22 +16,37 @@ TooltipModule.prototype.addLayeredArmorDiv = function(_data)
 {
 	var self = this;
 	var contentContainer = this.mContainer.find('.content-container:first');
-	var extraheight = 0;
-	$.each(_data, function(_idx, layer)
+	var leftContentContainer = contentContainer.find('.left-content-container:first');
+	var imageContainer = leftContentContainer.find(".l-image-container:first");
+
+	//set to relative and remove the image so that we can add the layer images here
+	imageContainer.css("position", "relative");
+	imageContainer.find("img:first").remove();
+	for (var idx = _data.length - 1; idx > -1; idx--)
 	{
-		var container = $('<div class="row content-container"></div>');
+		var layer = _data[idx];
+		var container = $('<div class="row content-container"></div>').appendTo(contentContainer);
 		container.attr('id', 'tooltip-module-content-layer-container-' + layer.id);
-		if (_idx != _data.length-1)
+
+		//top divider for the first one, no bottom divider for the last one
+		if (idx != 0)
 			container.addClass('ui-control-tooltip-module-bottom-devider')
-		contentContainer.append(container);
+		if (idx == _data.length - 1)
+			container.addClass('ui-control-tooltip-module-top-devider')
 
 		var leftDiv = $('<div class="left-content-container"></div>').appendTo(container);
 		var rightDiv = $('<div class="right-content-container"></div>').appendTo(container);
 		var main = layer[0];
-		self.addAtmosphericImageDiv(leftDiv, main);
-		// container.css("outline", "2px solid blue")
-		// leftDiv.css("outline", "2px solid green")
-		// rightDiv.css("outline", "2px solid red")
+		var imgDiv = self.addAtmosphericImageDiv(leftDiv, main);
+
+		// add image to the main image, position absolute to stack on top of each other
+		var img = imgDiv.find("img:first").clone();
+		imageContainer.append(img)
+		img.css("position", "absolute");
+		img.css("top", "0");
+		img.css("left", "0");
+		var zIndex = _data.length - 1 == idx ? 0 : idx; //base layer needs to go to bottom
+		img.css("z-index", zIndex );
 
 		var nameDiv = $('<div class="layer-item-title-container"></div>').appendTo(rightDiv);
 		var text = $('<div class="title title-font-normal font-bold font-color-ink"></div>').appendTo(nameDiv);
@@ -44,6 +58,7 @@ TooltipModule.prototype.addLayeredArmorDiv = function(_data)
 		});
 		text.html(parsedText.html);
 
+		// add extra content (durability, stamina, effects)
 		for(var x = 1; x < layer.length; x++)
 		{
 			var content = layer[x];
@@ -52,6 +67,6 @@ TooltipModule.prototype.addLayeredArmorDiv = function(_data)
 			else if (content.type == "progressbar")
 				self.addContentProgressbarDiv(rightDiv, content);
 		}
-	})
+	}
 };
 
