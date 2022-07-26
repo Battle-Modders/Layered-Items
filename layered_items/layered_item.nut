@@ -1,18 +1,10 @@
-::LayeredItems.hookLayeredItem <- function( o )
+::LayeredItems.hookLayeredItem <- function( o , _base)
 {
 	o.m.LayeredItems <- {
-		Layers = [],
-		Blocked = [], // not handled at all rn
-		Base = "",
+		Layers = array(::LayeredItems.Item[_base].Layer.len()),
+		Blocked = array(::LayeredItems.Item[_base].Layer.len(), false), // not handled at all rn
+		Base = _base,
 		Fresh = false // serialization stuffs
-	}
-
-	local create = o.create;
-	o.create = function()
-	{
-		create();
-		this.m.LayeredItems.Layers = array(::LayeredItems.Item[this.LayeredItems_getBase()].Layer.len());
-		this.m.LayeredItems.Blocked = array(::LayeredItems.Item[this.LayeredItems_getBase()].Layer.len(), false);
 	}
 
 	o.LayeredItems_getLayers <- function()
@@ -81,64 +73,12 @@
 	// 	}
 	// }
 
-	o.LayeredItems_returnFalseIfAnyFalse <- function( _function, _argsArray )
-	{
-		foreach (layer in this.LayeredItems_getLayers())
-		{
-			vargv[0] = layer;
-			if (layer[_function].acall(vargv) == false)
-			{
-				return false;
-			}
-		}
-		return true;
-	}
+	o.m.OldFunctions <- {};
 
 	local returnFalseIfAnyFalseFunctions = [
 		"isBought",
 		"isSold"
 	];
-
-	foreach (functionName in returnFalseIfAnyFalseFunctions)
-	{
-		local oldFunction = ::mods_getMember(o, functionName);
-		local tempName = functionName;
-		o[functionName] <- function( ... )
-		{
-			vargv.insert(0, this);
-			if (oldFunction.bindenv(this).acall(vargv) == false) return false;
-			return this.LayeredItems_returnFalseIfAnyFalse(tempName, vargv);
-		}
-	}
-
-	o.LayeredItems_getAddedValue <- function( _function, _base, _argsArray ) // _argsArray assumes 'this' slot exists
-	{
-		foreach (layer in this.LayeredItems_getLayers())
-		{
-			_argsArray[0] = layer;
-			_base += layer[_function].acall(_argsArray);
-		}
-		return _base;
-	}
-
-	local getCondition = ::mods_getMember(o, "getCondition"); //needed later
-	local getConditionMax = ::mods_getMember(o, "getConditionMax"); //needed later
-	local getStaminaModifier = ::mods_getMember(o, "getStaminaModifier"); //needed later
-
-	o.LayeredItems_getBaseCondition <- function()
-	{
-		return getCondition.bindenv(this).call(this);
-	}
-
-	o.LayeredItems_getBaseConditionMax <- function()
-	{
-		return getConditionMax.bindenv(this).call(this);
-	}
-
-	o.LayeredItems_getBaseStaminaModifier <- function()
-	{
-		return getStaminaModifier.bindenv(this).call(this);
-	}
 
 	local addedValueFunctions = [
 		"getCondition",
@@ -148,27 +88,6 @@
 		"getStaminaModifier",
 		"getValue"
 	]
-	// getDescription?
-
-	foreach (functionName in addedValueFunctions)
-	{
-		local tempName = functionName;
-		local oldFunction = ::mods_getMember(o, tempName);
-		o[tempName] <- function( ... )
-		{
-			vargv.insert(0, this)
-			return this.LayeredItems_getAddedValue(tempName, oldFunction.bindenv(this).acall(vargv), vargv);
-		}
-	}
-
-	o.LayeredItems_callOnFunction <- function( _function, _argsArray ) // _argsArray assumes 'this' slot exists
-	{
-		foreach (layer in this.LayeredItems_getLayers())
-		{
-			_argsArray[0] = layer;
-			layer[_function].acall(_argsArray);
-		}
-	}
 
 	local callOnFunctions = [
 		"setBought",
@@ -196,20 +115,90 @@
 		"onActorDied",
 		"onAddedToStash",
 		"onRemovedFromStash",
-
 	]
-
-	foreach (functionName in callOnFunctions)
+	local allFunctions = [];
+	allFunctions.extend(returnFalseIfAnyFalseFunctions);
+	allFunctions.extend(addedValueFunctions);
+	allFunctions.extend(callOnFunctions);
+	foreach (functionName in allFunctions)
 	{
-		local oldFunction = ::mods_getMember(o, functionName);
 		local tempName = functionName;
-		o[functionName] <- function( ... )
+		o.m.OldFunctions[functionName] <- ::mods_getMember(o, functionName);
+		if (returnFalseIfAnyFalseFunctions.find(functionName) != null)
 		{
-			vargv.insert(0, this);
-			oldFunction.bindenv(this).acall(vargv);
-			this.LayeredItems_callOnFunction(tempName, vargv);
+			o[functionName] <- function( ... )
+			{
+				vargv.insert(0, this);
+				if (this.m.OldFunctions[tempName].acall(vargv) == false) return false;
+				return this.LayeredItems_returnFalseIfAnyFalse(tempName, vargv);
+			}
+		}
+		else if (addedValueFunctions.find(functionName) != null)
+		{
+			o[functionName] <- function( ... )
+			{
+				vargv.insert(0, this)
+				return this.LayeredItems_getAddedValue(tempName, this.m.OldFunctions[tempName].acall(vargv), vargv);
+			}
+		}
+		else if (callOnFunctions.find(functionName) != null)
+		{
+			o[functionName] <- function( ... )
+			{
+				vargv.insert(0, this);
+				this.m.OldFunctions[tempName].acall(vargv);
+				this.LayeredItems_callOnFunction(tempName, vargv);
+			}
 		}
 	}
+
+	o.LayeredItems_returnFalseIfAnyFalse <- function( _function, _argsArray )
+	{
+		foreach (layer in this.LayeredItems_getLayers())
+		{
+			vargv[0] = layer;
+			if (layer[_function].acall(vargv) == false)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	o.LayeredItems_getAddedValue <- function( _function, _base, _argsArray ) // _argsArray assumes 'this' slot exists
+	{
+		foreach (layer in this.LayeredItems_getLayers())
+		{
+			_argsArray[0] = layer;
+			_base += layer[_function].acall(_argsArray);
+		}
+		return _base;
+	}
+
+	o.LayeredItems_callOnFunction <- function( _function, _argsArray ) // _argsArray assumes 'this' slot exists
+	{
+		foreach (layer in this.LayeredItems_getLayers())
+		{
+			_argsArray[0] = layer;
+			layer[_function].acall(_argsArray);
+		}
+	}
+
+	o.LayeredItems_getBaseCondition <- function()
+	{
+		return this.m.OldFunctions["getCondition"]();
+	}
+
+	o.LayeredItems_getBaseConditionMax <- function()
+	{
+		return this.m.OldFunctions["getConditionMax"]();
+	}
+
+	o.LayeredItems_getBaseStaminaModifier <- function()
+	{
+		return this.m.OldFunctions["getStaminaModifier"]();
+	}
+
 
 	o.LayeredItems_getUILayers <- function( _forceSmallIcon, _owner )
 	{

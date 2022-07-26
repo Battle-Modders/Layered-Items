@@ -13,10 +13,10 @@
 
 	::includeFiles(::IO.enumerateFiles("layered_items"))
 
-	::mods_hookExactClass("items/layered_armor/layered_armor", function (o)
-	{
-		::LayeredItems.hookLayeredItem(o);
-	});
+	// ::mods_hookExactClass("items/layered_armor/layered_armor", function (o)
+	// {
+	// 	::LayeredItems.hookLayeredItem(o);
+	// });
 
 	::mods_hookExactClass("items/layered_armor/layers/armor_layer", function (o)
 	{

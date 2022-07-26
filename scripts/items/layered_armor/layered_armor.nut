@@ -3,7 +3,7 @@ this.layered_armor <- this.inherit("scripts/items/armor/armor", {
 	function create()
 	{
 		this.armor.create();
-		this.m.LayeredItems.Base = "Armor";
+		::LayeredItems.hookLayeredItem(this, "Armor");
 	}
 
 	function setUpgrade( _upgrade )
