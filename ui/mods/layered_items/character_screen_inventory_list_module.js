@@ -22,3 +22,24 @@ CharacterScreenInventoryListModule.prototype.removeItemFromSlot = function(_slot
 	LayeredItems.assignListItemLayeredImage.call(_slot);
 	return ret;
 }
+
+LayeredItems.CharacterScreenInventoryListModule_createItemSlot = CharacterScreenInventoryListModule.prototype.createItemSlot;
+CharacterScreenInventoryListModule.prototype.createItemSlot = function ( _withPriceLayer, _backgroundImage, _classes )
+{
+	var ret = LayeredItems.CharacterScreenInventoryListModule_createItemSlot.call(this, _withPriceLayer, _backgroundImage, _classes);
+	var self = this;
+	ret.bindFirst("mousedown", function(_event)
+	{
+		if (MSU.Keybinds.isMousebindPressed(LayeredItems.ID, "SplitLayeredItem", _event))
+		{
+			_event.stopImmediatePropagation();
+			self.mDataSource.LayeredItems_notifyBackendSplitLayerClicked($(this).data('item').index, function (_data)
+			{
+				if (_data === null) return
+				self.mDataSource.LayeredItems_runStashActions(_data);
+			})
+			return false;
+		}
+	});
+	return ret;
+}

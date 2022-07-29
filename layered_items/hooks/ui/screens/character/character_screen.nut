@@ -49,6 +49,81 @@
 		return general_onEquipStashItem(_data)
 	}
 
+	o.LayeredItems_updateStashItem <- function( _actionTable, _item, _idx, _remove = false )
+	{
+		if (!("updateStashItems" in _actionTable)) _actionTable.updateStashItems <- [];
+		_actionTable.updateStashItems.push({
+			item = ::UIDataHelper.convertItemToUIData(_item, true),
+			idx = _idx,
+			remove = _remove
+		});
+	}
+
+	o.LayeredItems_updateBrother <- function( _actionTable, _brother )
+	{
+		if (!("updateBrother" in _actionTable)) _actionTable.updateBrother <- [];
+		_actionTable.updateBrother.push(::UIDataHelper.convertEntityToUIData(_brother));
+	}
+
+	o.LayeredItems_updateStashSize <- function( _actionTable )
+	{
+		_actionTable.updateStashSize <- {
+			stashSpaceUsed = ::World.Assets.getStash().getNumberOfFilledSlots(),
+			stashSpaceMax = ::World.Assets.getStash().getCapacity()
+		};
+	}
+
+	o.LayeredItems_wrapActionTableInError <- function( _actionTable )
+	{
+		return {
+			error = {
+				layeredItemsActions = _actionTable
+			}
+		};
+	}
+
+	local general_onSwapInventoryItem = o.general_onSwapInventoryItem;
+	o.general_onSwapInventoryItem = function( _data )
+	{
+		local data = this.helper_queryStashItemDataByIndex(_data[0], _data[1]);
+		if (data.targetItem != null)
+		{
+			data.targetItem = data.targetItem.item;
+			if (data.sourceItem.LayeredItems_isLayer() && data.targetItem.LayeredItems_isLayered() && ::LayeredItems.Mod.Keybinds.isKeybindPressed("MergeLayer"))
+			{
+				if (data.targetItem.LayeredItems_attachLayer(data.sourceItem))
+				{
+					data.stash.removeByIndex(data.sourceIndex);
+					data.sourceItem.playInventorySound(::Const.Items.InventoryEventType.Equipped);
+					local actionTable = {};
+					this.LayeredItems_updateStashItem(actionTable, data.sourceItem, data.sourceIndex, true);
+					this.LayeredItems_updateStashItem(actionTable, data.targetItem, data.targetIndex);
+					this.LayeredItems_updateStashSize(actionTable);
+					return this.LayeredItems_wrapActionTableInError(actionTable);
+				}
+			}
+		}
+		return general_onSwapInventoryItem(_data);
+	}
+
+	o.LayeredItems_onSplitLayeredItem <- function ( _itemIndex )
+	{
+		local item = ::World.Assets.getStash().getItemAtIndex(_itemIndex).item;
+		if (item == null || !item.LayeredItems_isLayered()) return null;
+		local layers = item.LayeredItems_getLayers();
+		if (layers.len() > ::World.Assets.getStash().getNumberOfEmptySlots()) return null;
+		local actionTable = {};
+		foreach (layer in layers)
+		{
+			item.LayeredItems_detachLayer(layer);
+			this.LayeredItems_updateStashItem(actionTable, layer, ::World.Assets.getStash().add(layer));
+		}
+		this.LayeredItems_updateStashItem(actionTable, item, _itemIndex);
+		item.playInventorySound(::Const.Items.InventoryEventType.PlacedInStash);
+		this.LayeredItems_updateStashSize(actionTable);
+		return actionTable;
+	}
+
 	// _data = [_brotherId, _sourceItem, _layer]
 	o.LayeredItems_onLayerButtonClicked <- function ( _data )
 	{
