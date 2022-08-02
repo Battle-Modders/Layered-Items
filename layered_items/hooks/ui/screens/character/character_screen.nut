@@ -86,18 +86,18 @@
 	o.general_onSwapInventoryItem = function( _data )
 	{
 		local data = this.helper_queryStashItemDataByIndex(_data[0], _data[1]);
-		if (data.targetItem != null)
+		if (data.targetItem != null && data.targetItem.item != null)
 		{
-			data.targetItem = data.targetItem.item;
-			if (data.sourceItem.LayeredItems_isLayer() && data.targetItem.LayeredItems_isLayered() && ::LayeredItems.Mod.Keybinds.isKeybindPressed("MergeLayer"))
+			local targetItem = data.targetItem.item;
+			if (data.sourceItem.LayeredItems_isLayer() && targetItem.LayeredItems_isLayered() && ::LayeredItems.Mod.Keybinds.isKeybindPressed("MergeLayer"))
 			{
-				if (data.targetItem.LayeredItems_attachLayer(data.sourceItem))
+				if (targetItem.LayeredItems_attachLayer(data.sourceItem))
 				{
 					data.stash.removeByIndex(data.sourceIndex);
 					data.sourceItem.playInventorySound(::Const.Items.InventoryEventType.Equipped);
 					local actionTable = {};
 					this.LayeredItems_updateStashItem(actionTable, data.sourceItem, data.sourceIndex, true);
-					this.LayeredItems_updateStashItem(actionTable, data.targetItem, data.targetIndex);
+					this.LayeredItems_updateStashItem(actionTable, targetItem, data.targetIndex);
 					this.LayeredItems_updateStashSize(actionTable);
 					return this.LayeredItems_wrapActionTableInError(actionTable);
 				}
