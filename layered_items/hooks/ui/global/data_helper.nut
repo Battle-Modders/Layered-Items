@@ -13,6 +13,8 @@
 				blocked = _item.LayeredItems_getBlockedArray(),
 				type = "layered" // should be a const value automatically shared with JS
 			};
+			if (_item.LayeredItems_isLegendary()) ret.layeredItems.legendary <- true;
+			if (_item.LayeredItems_isNamed()) ret.layeredItems.named <- true;
 		}
 		else if (_item.LayeredItems_isLayer())
 		{
@@ -22,6 +24,8 @@
 				layer = ::LayeredItems.getLayerFromType(_item.LayeredItems_getType()),
 				baseItem = ::LayeredItems.Item[_item.LayeredItems_getBase()].JSSlotName
 			}
+			if (_item.LayeredItems_isLegendary()) ret.layeredItems.legendary <- true;
+			if (_item.LayeredItems_isNamed()) ret.layeredItems.named <- true;
 		}
 
 		return ret;

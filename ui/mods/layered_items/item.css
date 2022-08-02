@@ -7,3 +7,8 @@
 	font-size: 3.2rem;
 	z-index: 4;
 }
+
+.ui-control.item > .layered-item-glow > img
+{
+	position: absolute;
+}

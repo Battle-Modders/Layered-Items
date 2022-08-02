@@ -1,24 +1,25 @@
 LayeredItems.CharacterScreenPaperdollModule_assignItemToSlot = CharacterScreenPaperdollModule.prototype.assignItemToSlot;
 CharacterScreenPaperdollModule.prototype.assignItemToSlot = function(_slot, _entityId, _item, _isBlocked)
 {
-	var ret = LayeredItems.CharacterScreenPaperdollModule_assignItemToSlot.call(this, _slot, _entityId, _item, _isBlocked);
-	if (_item !== null && (CharacterScreenIdentifier.Item.Id in _item) && (CharacterScreenIdentifier.Item.ImagePath in _item)) // remove item
+	var remove = _item === null || !(CharacterScreenIdentifier.Item.Id in _item) || !(CharacterScreenIdentifier.Item.ImagePath in _item)
+	if (!remove) // remove item
 	{
 		var itemData = _slot.Container.data('item');
 		itemData.layeredItems = _item.layeredItems;
 		_slot.Container.data('item', itemData);
-		LayeredItems.assignPaperdollLayeredImage.call(_slot.Container, _isBlocked);
 	}
+	var ret = LayeredItems.CharacterScreenPaperdollModule_assignItemToSlot.call(this, _slot, _entityId, _item, _isBlocked);
+	if (!remove) LayeredItems.assignPaperdollLayeredImage.call(_slot.Container, _isBlocked);
 	return ret;
 }
 
 LayeredItems.CharacterScreenPaperdollModule_removeItemFromSlot = CharacterScreenPaperdollModule.prototype.removeItemFromSlot;
 CharacterScreenPaperdollModule.prototype.removeItemFromSlot = function(_slot)
 {
-	var ret = LayeredItems.CharacterScreenPaperdollModule_removeItemFromSlot.call(this, _slot);
 	var itemData = _slot.Container.data('item');
 	itemData.layeredItems = null;
 	_slot.Container.data('item', itemData);
+	var ret = LayeredItems.CharacterScreenPaperdollModule_removeItemFromSlot.call(this, _slot);
 	LayeredItems.assignPaperdollLayeredImage.call(_slot.Container);
 	return ret;
 }

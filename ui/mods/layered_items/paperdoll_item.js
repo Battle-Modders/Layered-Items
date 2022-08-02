@@ -2,8 +2,31 @@ LayeredItems.createPaperdollItem = $.fn.createPaperdollItem;
 $.fn.createPaperdollItem = function(_isBig, _backgroundImage, _classes)
 {
 	var result = LayeredItems.createPaperdollItem.call(this, _isBig, _backgroundImage, _classes);
-	result.find('> .image-layer').filter(':first').append($('<div class="layered-item-layer"/>'));
+	var imageLayer = result.find('> .image-layer').filter(':first');
+	imageLayer.before($('<div class="layered-item-glow"/>'));
+	imageLayer.append($('<div class="layered-item-layer"/>'));
 	return result;
+}
+
+LayeredItems.assignPaperdollItemImage = $.fn.assignPaperdollItemImage;
+$.fn.assignPaperdollItemImage = function(_imagePath, _imageIsSmall, _isBlocked)
+{
+	var ret = LayeredItems.assignPaperdollItemImage.call(this, _imagePath, _imageIsSmall, _isBlocked);
+	var glowLayer = this.find('> .layered-item-glow').filter(':first');
+	glowLayer.empty();
+	var itemData = this.data('item');
+	if (itemData.layeredItems == undefined) return ret;
+	if (itemData.layeredItems.legendary)
+	{
+		if (_imageIsSmall) glowLayer.append('<img src="' + Path.GFX + LayeredItems.Assets.LegendaryGlow + '"/>');
+		else glowLayer.append('<img src="' + Path.GFX + LayeredItems.Assets.LegendaryGlowLarge + '"/>');
+	}
+	if (itemData.layeredItems.named)
+	{
+		if (_imageIsSmall) glowLayer.append('<img src="' + Path.GFX + LayeredItems.Assets.NamedGlow + '"/>');
+		else glowLayer.append('<img src="' + Path.GFX + LayeredItems.Assets.NamedGlowLarge + '"/>');
+	}
+	return ret;
 }
 
 // $.fn.assignPaperdollItemOverlayImage is the original ish

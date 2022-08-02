@@ -55,6 +55,17 @@
 		return this.m.LayeredItems.Base;
 	}
 
+	o.LayeredItems_isNamed <- function()
+	{
+		return this.item.LayeredItems_isNamed() || this.LayeredItems_getLayers().filter(@(_idx, _layer) _layer.LayeredItems_isNamed()).len() > 0;
+	}
+
+	o.LayeredItems_isLegendary <- function()
+	{
+		return this.item.LayeredItems_isLegendary() || this.LayeredItems_getLayers().filter(@(_idx, _layer) _layer.LayeredItems_isLegendary()).len() > 0;
+	}
+
+
 	// o.LayeredItems_returnTrueIfAnyTrue <- function( _function, _argsArray )
 	// {
 	// 	foreach (layer in this.m.LayeredItems.Layers)

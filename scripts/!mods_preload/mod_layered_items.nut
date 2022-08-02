@@ -24,6 +24,7 @@
 	});
 
 	::mods_registerJS("layered_items/layered_items.js");
+	::mods_registerJS("layered_items/assets.js");
 	::mods_registerJS("layered_items/item.js");
 	::mods_registerJS("layered_items/paperdoll_item.js");
 	::mods_registerJS("layered_items/character_screen_datasource.js");
@@ -33,9 +34,9 @@
 	::mods_registerJS("layered_items/world_town_screen_shop_dialog_module.js")
 	::mods_registerCSS("layered_items/button.css");
 	::mods_registerCSS("layered_items/item.css");
+	::mods_registerCSS("layered_items/paperdoll_item.css");
 	::mods_registerCSS("layered_items/character_screen_paperdoll_module.css");
 	::mods_registerJS("layered_items/tooltip.js");
-	::mods_registerCSS("layered_items/tooltip.css");
 
 	local new = ::new; // big boi dangerous hook
 	::new = function( _scriptName )

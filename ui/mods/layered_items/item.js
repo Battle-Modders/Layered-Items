@@ -3,9 +3,23 @@ $.fn.createListItem = function(_withPriceLayer, _backgroundImage, _classes)
 {
 	var result = LayeredItems.createListItem.call(this, _withPriceLayer, _backgroundImage, _classes);
 	var imageLayer = result.find('> .image-layer').filter(':first');
+	imageLayer.before($('<div class="layered-item-glow"/>'));
 	imageLayer.append($('<div class="layered-item-layer"/>'));
 	imageLayer.append($('<div class="layered-item-type title-font font-color-title font-bottom-shadow font-bold">'));
 	return result;
+}
+
+LayeredItems.assignListItemImage = $.fn.assignListItemImage;
+$.fn.assignListItemImage = function (_imagePath)
+{
+	var ret = LayeredItems.assignListItemImage.call(this, _imagePath);
+	var glowLayer = this.find('> .layered-item-glow').filter(':first');
+	glowLayer.empty();
+	var itemData = this.data('item');
+	if (itemData.layeredItems == undefined) return ret;
+	if (itemData.layeredItems.legendary) glowLayer.append('<img src="' + Path.GFX + LayeredItems.Assets.LegendaryGlow + '"/>');
+	if (itemData.layeredItems.named) glowLayer.append('<img src="' + Path.GFX + LayeredItems.Assets.NamedGlow + '"/>');
+	return ret;
 }
 
 LayeredItems.assignListItemLayeredImage = function()
